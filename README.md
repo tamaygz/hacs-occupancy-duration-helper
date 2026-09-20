@@ -8,6 +8,8 @@ Occupancy Duration Helper is a Home Assistant custom integration that turns moti
 
 It grew out of practical bathroom automations in my own home: I wanted to play music on the toilet, but only when actually pooping, so a fade-in starts only when a longer visit reaches the configured long stage. I also wanted music and ventilation while showering, but not when someone only enters briefly to wash their hands. This integration makes those use cases easy by listening to a motion sensor and tracking the session over time according to the configured stage profile.
 
+<img width="1109" height="702" alt="image" src="https://github.com/user-attachments/assets/5dcb33a5-00eb-4e6b-8f88-d1688f52dc03" />
+
 ## Quick Start
 
 [![Open your Home Assistant instance and add this repository in HACS][hacs-repository-badge]][hacs-repository-url]
