@@ -9,9 +9,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 
-from .const import DATA_COORDINATOR, DOMAIN, PLATFORMS
+from .const import CONF_STAGES, DATA_COORDINATOR, DOMAIN, PLATFORMS
 from .coordinator import OccupancyDurationCoordinator
 from .entity import ENTITY_OBJECT_SUFFIXES, build_entity_id, is_legacy_entity_id
+from .storage import SessionStore
 
 _LOGGER = logging.getLogger(__name__)
 _DIAGNOSTIC_OBJECT_SUFFIXES = (
@@ -20,12 +21,14 @@ _DIAGNOSTIC_OBJECT_SUFFIXES = (
     "last_activity",
     "session_started",
 )
+_OPTIONAL_OBJECT_SUFFIXES = ("stage",)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Occupancy Duration Helper from a config entry."""
     _async_migrate_legacy_entity_ids(hass, entry)
     _async_enable_diagnostic_entities(hass, entry)
+    _async_sync_optional_entities(hass, entry)
 
     coordinator = OccupancyDurationCoordinator(hass, entry)
     await coordinator.async_initialize()
@@ -50,6 +53,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload the entry when options change."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Purge persisted data when a config entry is deleted."""
+    await SessionStore(hass).async_save_session(entry.entry_id, None)
 
 
 def _async_migrate_legacy_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -106,3 +114,23 @@ def _async_enable_diagnostic_entities(hass: HomeAssistant, entry: ConfigEntry) -
             continue
 
         ent_reg.async_update_entity(entity_id, disabled_by=None)
+
+
+def _async_sync_optional_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove options-controlled entities that should no longer exist."""
+    ent_reg = er.async_get(hass)
+    has_stages = bool(entry.options.get(CONF_STAGES, []))
+
+    for object_suffix in _OPTIONAL_OBJECT_SUFFIXES:
+        if object_suffix == "stage" and has_stages:
+            continue
+
+        entity_domain = ENTITY_OBJECT_SUFFIXES[object_suffix]
+        entity_id = ent_reg.async_get_entity_id(
+            entity_domain,
+            DOMAIN,
+            f"{entry.entry_id}_{object_suffix}",
+        )
+        if entity_id is None:
+            continue
+        ent_reg.async_remove(entity_id)
