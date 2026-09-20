@@ -290,7 +290,14 @@ def grace_expired(
             changed=False,
         )
 
-    updated = replace(session, state=SessionState.CLOSED, ended_at=now)
+    updated = replace(
+        session,
+        state=SessionState.CLOSED,
+        ended_at=now,
+        stage=None,
+        decay_anchor_at=None,
+        decay_anchor_score=None,
+    )
     return SessionTransition(
         session=updated,
         previous_state=session.state,

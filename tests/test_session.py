@@ -95,6 +95,36 @@ def test_grace_expiry_closes_session() -> None:
     assert closed.session.ended_at == started + timedelta(seconds=200)
 
 
+def test_grace_expiry_clears_stage_after_session_resets() -> None:
+    started = _now()
+    stages = (
+        DurationStage("short", "Short", 0, 60, 30),
+        DurationStage("long", "Long", 60, None, 180),
+    )
+    session = activity_detected(
+        start_session(started).session,
+        started + timedelta(seconds=90),
+        stages=stages,
+    ).session
+    ending = decay_tick(
+        source_became_inactive(session, started + timedelta(seconds=120)).session,
+        SessionEvaluationInput(
+            now=started + timedelta(seconds=400),
+            source_currently_active=False,
+            authoritative_active=False,
+            elapsed_since_last_activity=310.0,
+            default_half_life=60.0,
+            end_threshold=90.0,
+            stages=stages,
+        ),
+    ).session
+
+    closed = grace_expired(ending, started + timedelta(seconds=500), end_grace_seconds=15)
+
+    assert closed.session.state == SessionState.CLOSED
+    assert closed.session.stage is None
+
+
 def test_new_session_starts_after_closure() -> None:
     first = start_session(_now()).session
     ending = decay_tick(
