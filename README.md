@@ -4,7 +4,31 @@
 [![hacs][hacs-shield]][hacs]
 [![License][license-shield]](LICENSE)
 
-> Home Assistant custom integration that turns motion and presence sensors into **persistent occupancy sessions** with duration tracking, configurable stages, and adaptive decay.
+Occupancy Duration Helper is a Home Assistant custom integration that turns motion and presence signals into persistent occupancy sessions with duration tracking, configurable stages, and adaptive decay.
+
+## Quick Start
+
+[![Open your Home Assistant instance and add this repository in HACS][hacs-repository-badge]][hacs-repository-url]
+
+1. Click the HACS button above to add this repository.
+2. In HACS, download **Occupancy Duration Helper**.
+3. Restart Home Assistant.
+4. Go to **Settings → Devices & services → Add Integration**.
+5. Search for **Occupancy Duration Helper** and complete the setup flow.
+
+<details>
+  <summary>Manual installation</summary>
+
+1. Download or clone this repository.
+2. Copy `custom_components/occupancy_duration` to:
+   ```
+   /config/custom_components/occupancy_duration
+   ```
+3. Restart Home Assistant.
+4. Go to **Settings → Devices & services → Add Integration**.
+5. Search for **Occupancy Duration Helper** and complete the setup flow.
+
+</details>
 
 ---
 
@@ -86,12 +110,10 @@ Duration sensor · Occupancy binary sensor · Stage sensor
 
 ### HACS (recommended)
 
-1. Open HACS in Home Assistant.
-2. Go to **Integrations**.
-3. Search for **Occupancy Duration Helper**.
-4. Click **Download**.
-5. Restart Home Assistant if prompted.
-6. Go to **Settings → Devices & services → Add Integration** and search for **Occupancy Duration Helper**.
+1. Click the HACS button in [Quick Start](#quick-start) to add this repository.
+2. Open HACS and download **Occupancy Duration Helper**.
+3. Restart Home Assistant if prompted.
+4. Go to **Settings → Devices & services → Add Integration** and search for **Occupancy Duration Helper**.
 
 ### Manual
 
@@ -294,6 +316,8 @@ MIT — see [LICENSE](LICENSE).
 [releases]: https://github.com/tamaygz/hacs-occupancy-duration-helper/releases
 [hacs-shield]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=flat-square
 [hacs]: https://hacs.xyz
+[hacs-repository-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
+[hacs-repository-url]: https://my.home-assistant.io/redirect/hacs_repository/?owner=tamaygz&repository=hacs-occupancy-duration-helper&category=integration
 [license-shield]: https://img.shields.io/github/license/tamaygz/hacs-occupancy-duration-helper.svg?style=flat-square
 [issues]: https://github.com/tamaygz/hacs-occupancy-duration-helper/issues
 occupancy decay
