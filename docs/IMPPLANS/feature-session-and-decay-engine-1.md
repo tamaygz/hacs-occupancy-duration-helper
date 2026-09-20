@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'Completed'
 tags: [feature, runtime, session, decay, stages]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Session And Decay Engine Plan
 
@@ -34,9 +34,9 @@ tags: [feature, runtime, session, decay, stages]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Create `custom_components/occupancy_duration/session.py` with `OccupancySession`, `SessionState`, and explicit transition-result types for start, reinforce, decay, ending, and closure events. |  |  |
-| TASK-002 | Create `custom_components/occupancy_duration/stage.py` with `DurationStage`, monotonic stage resolution helpers, and validation for contiguous or intentionally non-overlapping duration ranges. |  |  |
-| TASK-003 | Extend `custom_components/occupancy_duration/const.py` with shared default values for half-life, end-threshold, end-grace, and score bounds. |  |  |
+| TASK-001 | Create `custom_components/occupancy_duration/session.py` with `OccupancySession`, `SessionState`, and explicit transition-result types for start, reinforce, decay, ending, and closure events. | ✅ | 2026-09-20 |
+| TASK-002 | Create `custom_components/occupancy_duration/stage.py` with `DurationStage`, monotonic stage resolution helpers, and validation for contiguous or intentionally non-overlapping duration ranges. | ✅ | 2026-09-20 |
+| TASK-003 | Extend `custom_components/occupancy_duration/const.py` with shared default values for half-life, end-threshold, end-grace, and score bounds. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Decay Mathematics And Transition Rules
 
@@ -44,9 +44,9 @@ tags: [feature, runtime, session, decay, stages]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Create `custom_components/occupancy_duration/decay.py` with an exponential decay function that accepts `score0`, `elapsed_seconds`, and `half_life_seconds` and returns a bounded score. |  |  |
-| TASK-005 | Implement strategy-aware decay guards in `custom_components/occupancy_duration/decay.py` so readable active source states pause decay and optionally reinforce score. |  |  |
-| TASK-006 | Implement state-transition helpers in `custom_components/occupancy_duration/session.py` for `activity_detected`, `source_became_inactive`, `decay_tick`, `score_below_threshold`, and `grace_expired`. |  |  |
+| TASK-004 | Create `custom_components/occupancy_duration/decay.py` with an exponential decay function that accepts `score0`, `elapsed_seconds`, and `half_life_seconds` and returns a bounded score. | ✅ | 2026-09-20 |
+| TASK-005 | Implement strategy-aware decay guards in `custom_components/occupancy_duration/decay.py` so readable active source states pause decay and optionally reinforce score. | ✅ | 2026-09-20 |
+| TASK-006 | Implement state-transition helpers in `custom_components/occupancy_duration/session.py` for `activity_detected`, `source_became_inactive`, `decay_tick`, `score_below_threshold`, and `grace_expired`. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Stage-Aware Runtime Evaluation
 
@@ -54,9 +54,9 @@ tags: [feature, runtime, session, decay, stages]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Implement stage resolution in `custom_components/occupancy_duration/stage.py` so current duration selects a stage without ever regressing to a lower stage. |  |  |
-| TASK-008 | Implement per-stage half-life selection in `custom_components/occupancy_duration/decay.py` so stage-specific decay overrides the default half-life only for future evaluations. |  |  |
-| TASK-009 | Define a scheduler-facing evaluation contract in `custom_components/occupancy_duration/session.py` for use by `custom_components/occupancy_duration/coordinator.py`, including what inputs are required on each decay tick. |  |  |
+| TASK-007 | Implement stage resolution in `custom_components/occupancy_duration/stage.py` so current duration selects a stage without ever regressing to a lower stage. | ✅ | 2026-09-20 |
+| TASK-008 | Implement per-stage half-life selection in `custom_components/occupancy_duration/decay.py` so stage-specific decay overrides the default half-life only for future evaluations. | ✅ | 2026-09-20 |
+| TASK-009 | Define a scheduler-facing evaluation contract in `custom_components/occupancy_duration/session.py` for use by `custom_components/occupancy_duration/coordinator.py`, including what inputs are required on each decay tick. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Test Coverage And Edge Cases
 
@@ -64,9 +64,9 @@ tags: [feature, runtime, session, decay, stages]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-010 | Create `tests/test_session.py` with cases covering session start, reinforcement without `started_at` reset, `DECAYING -> ACTIVE`, `ENDING -> CLOSED`, and new-session-after-closure behavior. |  |  |
-| TASK-011 | Create `tests/test_decay.py` with cases covering active-state decay suppression, inactive-state decay application, event-only fallback, threshold transitions, and grace-period closure. |  |  |
-| TASK-012 | Create `tests/test_stage.py` with cases covering monotonic stage progression, per-stage half-life selection, and long-duration stationary occupancy behavior. |  |  |
+| TASK-010 | Create `tests/test_session.py` with cases covering session start, reinforcement without `started_at` reset, `DECAYING -> ACTIVE`, `ENDING -> CLOSED`, and new-session-after-closure behavior. | ✅ | 2026-09-20 |
+| TASK-011 | Create `tests/test_decay.py` with cases covering active-state decay suppression, inactive-state decay application, event-only fallback, threshold transitions, and grace-period closure. | ✅ | 2026-09-20 |
+| TASK-012 | Create `tests/test_stage.py` with cases covering monotonic stage progression, per-stage half-life selection, and long-duration stationary occupancy behavior. | ✅ | 2026-09-20 |
 
 ## Section 3 - Alternatives
 
