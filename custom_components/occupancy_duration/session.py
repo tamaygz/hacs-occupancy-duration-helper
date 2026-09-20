@@ -122,7 +122,7 @@ def activity_detected(
 ) -> SessionTransition:
     """Start or reinforce a session without resetting started_at."""
     if session is None or session.state in {SessionState.CLOSED, SessionState.IDLE}:
-        return start_session(now, score=SCORE_MAX if authoritative else reinforce_score(0.0), session_id=None)
+        return start_session(now, score=SCORE_MAX if authoritative else reinforce_score(0.0))
 
     updated = replace(
         session,

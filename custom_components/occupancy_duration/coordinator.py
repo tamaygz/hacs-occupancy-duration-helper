@@ -69,37 +69,9 @@ class RuntimeSnapshot:
     last_transition_reason: str = ""
 
 
-def build_runtime_snapshot(
-    *,
-    entry_id: str,
-    source_entity: str,
-    source_revision: int,
-    capability_summary: CapabilitySummary,
-    strategy: StrategyMode,
-    session: OccupancySession | None,
-    source_state: str | None,
-    restore_session: bool,
-    default_half_life: int,
-    end_threshold: int,
-    end_grace: int,
-    stages: tuple[DurationStage, ...],
-    last_transition_reason: str = "",
-) -> RuntimeSnapshot:
-    return RuntimeSnapshot(
-        entry_id=entry_id,
-        source_entity=source_entity,
-        source_revision=source_revision,
-        capability_summary=capability_summary,
-        strategy=strategy,
-        session=session,
-        source_state=source_state,
-        restore_session=restore_session,
-        default_half_life=default_half_life,
-        end_threshold=end_threshold,
-        end_grace=end_grace,
-        stages=stages,
-        last_transition_reason=last_transition_reason,
-    )
+# build_runtime_snapshot is a thin alias kept for test compatibility; prefer
+# calling RuntimeSnapshot(...) directly in non-test code.
+build_runtime_snapshot = RuntimeSnapshot
 
 
 class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
@@ -148,16 +120,21 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
             for payload in stage_payloads
         )
 
+    @property
+    def _opts(self) -> dict[str, Any]:
+        return dict(self._config_entry_ref.options)
+
     async def async_initialize(self) -> None:
         """Inspect source, restore state, and subscribe to updates."""
+        opts = self._opts
         capability_summary = await async_inspect_entity(
             self.hass,
             self.source_entity,
-            self._config_entry_ref.options.get(CONF_STRATEGY),
+            opts.get(CONF_STRATEGY),
         )
         source_state = self._read_source_state()
         restored = None
-        if self._config_entry_ref.options.get(CONF_RESTORE_SESSION, DEFAULT_RESTORE_SESSION):
+        if opts.get(CONF_RESTORE_SESSION, DEFAULT_RESTORE_SESSION):
             restored = await self._store.async_load_session(self._config_entry_ref.entry_id)
 
         session, reason = self._restore_or_seed_session(
@@ -167,7 +144,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         )
 
         self.async_set_updated_data(
-            build_runtime_snapshot(
+            RuntimeSnapshot(
                 entry_id=self._config_entry_ref.entry_id,
                 source_entity=self.source_entity,
                 source_revision=self.source_revision,
@@ -175,10 +152,10 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
                 strategy=self.strategy,
                 session=session,
                 source_state=source_state,
-                restore_session=bool(self._config_entry_ref.options.get(CONF_RESTORE_SESSION, DEFAULT_RESTORE_SESSION)),
-                default_half_life=int(self._config_entry_ref.options.get(CONF_DEFAULT_HALF_LIFE, DEFAULT_HALF_LIFE)),
-                end_threshold=int(self._config_entry_ref.options.get(CONF_END_THRESHOLD, DEFAULT_END_THRESHOLD)),
-                end_grace=int(self._config_entry_ref.options.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
+                restore_session=bool(opts.get(CONF_RESTORE_SESSION, DEFAULT_RESTORE_SESSION)),
+                default_half_life=int(opts.get(CONF_DEFAULT_HALF_LIFE, DEFAULT_HALF_LIFE)),
+                end_threshold=int(opts.get(CONF_END_THRESHOLD, DEFAULT_END_THRESHOLD)),
+                end_grace=int(opts.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
                 stages=self.stages,
                 last_transition_reason=reason,
             )
@@ -265,6 +242,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
             transition = activity_detected(restored, now, authoritative=authoritative, stages=self.stages)
             return transition.session, transition.reason
 
+        opts = self._opts
         transition = decay_tick(
             source_became_inactive(restored).session if restored.state == SessionState.ACTIVE else restored,
             SessionEvaluationInput(
@@ -272,9 +250,9 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
                 source_currently_active=False,
                 authoritative_active=False,
                 elapsed_since_last_activity=max(0.0, (now - restored.last_activity_at).total_seconds()),
-                default_half_life=int(self._config_entry_ref.options.get(CONF_DEFAULT_HALF_LIFE, DEFAULT_HALF_LIFE)),
-                end_threshold=int(self._config_entry_ref.options.get(CONF_END_THRESHOLD, DEFAULT_END_THRESHOLD)),
-                end_grace_seconds=int(self._config_entry_ref.options.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
+                default_half_life=int(opts.get(CONF_DEFAULT_HALF_LIFE, DEFAULT_HALF_LIFE)),
+                end_threshold=int(opts.get(CONF_END_THRESHOLD, DEFAULT_END_THRESHOLD)),
+                end_grace_seconds=int(opts.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
                 stages=self.stages,
             ),
         )
@@ -282,7 +260,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
             closed = grace_expired(
                 transition.session,
                 now,
-                end_grace_seconds=int(self._config_entry_ref.options.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
+                end_grace_seconds=int(opts.get(CONF_END_GRACE, DEFAULT_END_GRACE)),
             )
             if closed.changed:
                 return closed.session, closed.reason

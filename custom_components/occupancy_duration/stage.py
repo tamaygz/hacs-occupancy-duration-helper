@@ -62,8 +62,8 @@ def resolve_stage(
     if not stages:
         return None
 
-    validate_stages(stages)
-
+    # validate_stages is O(n) and called on every decode-tick; callers that build
+    # stages from persisted config validate once at config load.
     matched: DurationStage | None = None
     for stage in stages:
         if stage.contains(duration_seconds):
@@ -71,8 +71,10 @@ def resolve_stage(
             break
 
     if matched is None:
-        # Duration might be before the first stage or in a deliberate gap.
-        return next((stage for stage in stages if stage.min_duration <= duration_seconds), None)
+        # Duration is before the first stage or in a deliberate gap; return the
+        # highest-min stage that does not exceed duration_seconds.
+        candidates = [s for s in stages if s.min_duration <= duration_seconds]
+        return candidates[-1] if candidates else None
 
     if current_stage_id is None:
         return matched

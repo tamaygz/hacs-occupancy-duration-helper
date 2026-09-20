@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -21,7 +19,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
+    coordinator: OccupancyDurationCoordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
     async_add_entities([OccupancyBinarySensor(coordinator, entry)])
 
 
@@ -31,6 +29,7 @@ class OccupancyBinarySensor(CoordinatorEntity[OccupancyDurationCoordinator], Bin
     _attr_has_entity_name = True
     _attr_name = "Occupancy"
     _attr_device_class = BinarySensorDeviceClass.OCCUPANCY
+    _attr_should_poll = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator)
@@ -38,6 +37,6 @@ class OccupancyBinarySensor(CoordinatorEntity[OccupancyDurationCoordinator], Bin
 
     @property
     def is_on(self) -> bool:
-        data = cast(RuntimeSnapshot | None, self.coordinator.data)
+        data: RuntimeSnapshot | None = self.coordinator.data
         session = data.session if data is not None else None
         return bool(session and session.active)

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import cast
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -12,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .coordinator import OccupancyDurationCoordinator, RuntimeSnapshot
 from .const import (
     ATTR_ACTIVE,
     ATTR_LAST_ACTIVITY_AT,
@@ -63,7 +63,7 @@ class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):
 
     @property
     def native_value(self) -> int | None:
-        data = cast(RuntimeSnapshot | None, self.coordinator.data)
+        data: RuntimeSnapshot | None = self.coordinator.data
         session = data.session if data is not None else None
         if session is None or not session.active:
             return 0
@@ -71,7 +71,7 @@ class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, object]:
-        data = cast(RuntimeSnapshot | None, self.coordinator.data)
+        data: RuntimeSnapshot | None = self.coordinator.data
         session = data.session if data is not None else None
         return {
             ATTR_ACTIVE: bool(session and session.active),
@@ -94,6 +94,6 @@ class OccupancyDurationStageSensor(OccupancyBaseEntity, SensorEntity):
 
     @property
     def native_value(self) -> str | None:
-        data = cast(RuntimeSnapshot | None, self.coordinator.data)
+        data: RuntimeSnapshot | None = self.coordinator.data
         session = data.session if data is not None else None
         return session.stage if session else None

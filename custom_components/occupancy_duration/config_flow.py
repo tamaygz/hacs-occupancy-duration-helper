@@ -210,9 +210,12 @@ class OccupancyDurationConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def is_matching(self, other_flow: ConfigFlow) -> bool:
         """Return whether another in-progress flow targets the same source entity."""
-        return isinstance(other_flow, OccupancyDurationConfigFlow) and (
-            getattr(other_flow, "_source_entity", None) == self._source_entity
-        )
+        if not isinstance(other_flow, OccupancyDurationConfigFlow):
+            return False
+        self_src = self._source_entity
+        other_src = getattr(other_flow, "_source_entity", None)
+        # Only match when both flows have selected an entity (None != None is false-positive).
+        return self_src is not None and self_src == other_src
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         errors: dict[str, str] = {}

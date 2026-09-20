@@ -63,12 +63,11 @@ class SessionStore:
         return deserialize_session(payload.get(entry_id))
 
     async def async_save_session(self, entry_id: str, session: OccupancySession | None) -> None:
+        # Single load → mutate → save to avoid separate round-trips.
         payload = await self._store.async_load() or {}
-        if session is None:
+        serialised = serialize_session(session)
+        if serialised is None:
             payload.pop(entry_id, None)
         else:
-            payload[entry_id] = serialize_session(session)
+            payload[entry_id] = serialised
         await self._store.async_save(payload)
-
-    async def async_delete_session(self, entry_id: str) -> None:
-        await self.async_save_session(entry_id, None)

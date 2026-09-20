@@ -9,17 +9,16 @@ from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
 from .const import StrategyMode
 
 _LOGGER = logging.getLogger(__name__)
 
-# Binary-sensor device classes that carry occupancy/presence semantics.
-_OCCUPANCY_DEVICE_CLASSES = frozenset(
-    {BinarySensorDeviceClass.OCCUPANCY, BinarySensorDeviceClass.PRESENCE}
-)
-_MOTION_DEVICE_CLASSES = frozenset({BinarySensorDeviceClass.MOTION})
+# String values of occupancy/presence device classes for fast comparison.
+_OCCUPANCY_DC = str(BinarySensorDeviceClass.OCCUPANCY)
+_PRESENCE_DC = str(BinarySensorDeviceClass.PRESENCE)
+_MOTION_DC = str(BinarySensorDeviceClass.MOTION)
 
 
 class CapabilityConfidence(StrEnum):
@@ -115,8 +114,6 @@ async def build_source_snapshot(
 ) -> SourceSnapshot:
     """Build a SourceSnapshot for *entity_id* from live HA registry and state."""
     ent_reg = er.async_get(hass)
-    dev_reg = dr.async_get(hass)
-
     entry = ent_reg.async_get(entity_id)
     state_obj = hass.states.get(entity_id)
 
@@ -131,18 +128,16 @@ async def build_source_snapshot(
         device_class = entry.device_class or entry.original_device_class
         device_id = entry.device_id
 
-    # Prefer device_class from live state attributes over registry when missing
+    # Fall back to live state attribute when registry has no device_class.
     if not device_class:
         device_class = attributes.get("device_class")
 
     if device_id:
-        device = dev_reg.async_get(device_id)
-        if device:
-            sibling_ids = tuple(
-                e.entity_id
-                for e in er.async_entries_for_device(ent_reg, device_id)
-                if e.entity_id != entity_id
-            )
+        sibling_ids = tuple(
+            e.entity_id
+            for e in er.async_entries_for_device(ent_reg, device_id)
+            if e.entity_id != entity_id
+        )
 
     return SourceSnapshot(
         entity_id=entity_id,
@@ -182,21 +177,21 @@ def inspect_capabilities(
     )
 
     # --- occupancy_state / presence_state ---
+    is_occupancy_dc = dc == _OCCUPANCY_DC
+    is_presence_dc = dc == _PRESENCE_DC
     occupancy_state = CapabilityFinding(
-        present=dc in _OCCUPANCY_DEVICE_CLASSES and dc == str(BinarySensorDeviceClass.OCCUPANCY),
-        confidence=CapabilityConfidence.CONFIRMED if dc == str(BinarySensorDeviceClass.OCCUPANCY)
-        else CapabilityConfidence.UNKNOWN,
-        rationale="device_class=occupancy" if dc == str(BinarySensorDeviceClass.OCCUPANCY) else "",
+        present=is_occupancy_dc,
+        confidence=CapabilityConfidence.CONFIRMED if is_occupancy_dc else CapabilityConfidence.UNKNOWN,
+        rationale="device_class=occupancy" if is_occupancy_dc else "",
     )
     presence_state = CapabilityFinding(
-        present=dc == str(BinarySensorDeviceClass.PRESENCE),
-        confidence=CapabilityConfidence.CONFIRMED if dc == str(BinarySensorDeviceClass.PRESENCE)
-        else CapabilityConfidence.UNKNOWN,
-        rationale="device_class=presence" if dc == str(BinarySensorDeviceClass.PRESENCE) else "",
+        present=is_presence_dc,
+        confidence=CapabilityConfidence.CONFIRMED if is_presence_dc else CapabilityConfidence.UNKNOWN,
+        rationale="device_class=presence" if is_presence_dc else "",
     )
 
     # --- motion_state ---
-    is_motion_dc = dc == str(BinarySensorDeviceClass.MOTION)
+    is_motion_dc = dc == _MOTION_DC
     motion_state = CapabilityFinding(
         present=is_motion_dc and domain == "binary_sensor",
         confidence=CapabilityConfidence.CONFIRMED if is_motion_dc else CapabilityConfidence.UNKNOWN,
@@ -225,9 +220,8 @@ def inspect_capabilities(
     is_event_only = domain == "event"
     event_only = CapabilityFinding(
         present=is_event_only,
-        confidence=CapabilityConfidence.CONFIRMED if is_event_only else CapabilityConfidence.CONFIRMED,
-        rationale="entity is an event entity with no persistent state" if is_event_only
-        else "entity has persistent state",
+        confidence=CapabilityConfidence.CONFIRMED if is_event_only else CapabilityConfidence.UNKNOWN,
+        rationale="entity is an event entity with no persistent state" if is_event_only else "",
     )
 
     # --- start/end events (inferred for binary sensors) ---
@@ -259,17 +253,14 @@ def inspect_capabilities(
     # --- sibling occupancy entity on same device ---
     sibling_occupancy: str | None = None
     if snapshot.sibling_entity_ids:
-        ent_reg = er.async_get(hass)
+        ent_reg_sib = er.async_get(hass)
         for sib_id in snapshot.sibling_entity_ids:
             if not sib_id.startswith("binary_sensor."):
                 continue
-            sib_entry = ent_reg.async_get(sib_id)
+            sib_entry = ent_reg_sib.async_get(sib_id)
             if sib_entry:
                 sib_dc = sib_entry.device_class or sib_entry.original_device_class
-                if sib_dc in (
-                    str(BinarySensorDeviceClass.OCCUPANCY),
-                    str(BinarySensorDeviceClass.PRESENCE),
-                ):
+                if sib_dc in (_OCCUPANCY_DC, _PRESENCE_DC):
                     sibling_occupancy = sib_id
                     break
 
@@ -313,7 +304,7 @@ def recommend_strategy(caps: SensorCapabilities) -> StrategyMode:
       2. Sibling occupancy + motion    → HYBRID
       3. Continuous ON/OFF motion      → CONTINUOUS_MOTION
       4. Event-only                    → EVENT_ONLY
-      5. Fallback                      → CONTINUOUS_MOTION (least wrong default)
+      5. Fallback                      → EVENT_ONLY (conservative: assume no state)
     """
     if caps.occupancy_state.present or caps.presence_state.present:
         return StrategyMode.NATIVE_OCCUPANCY
@@ -327,7 +318,7 @@ def recommend_strategy(caps: SensorCapabilities) -> StrategyMode:
     if caps.event_only.present:
         return StrategyMode.EVENT_ONLY
 
-    # Non-motion binary sensor with readable state
+    # Readable binary sensor without an explicit motion device class.
     if caps.continuous_state.present:
         return StrategyMode.CONTINUOUS_MOTION
 
@@ -360,7 +351,7 @@ def resolve_strategy(
 
 def _yn(finding: CapabilityFinding) -> str:
     if finding.present:
-        return f"✓ ({finding.confidence})"
+        return f"✓ ({finding.confidence.value})"
     if finding.confidence == CapabilityConfidence.UNKNOWN:
         return "✗ (not detected)"
     return "✗"
