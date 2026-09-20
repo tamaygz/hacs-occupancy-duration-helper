@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'In progress'
+status: 'Completed'
 tags: [infrastructure, hacs, repository, branding, documentation]
 ---
 
-![Status: In progress](https://img.shields.io/badge/status-In%20progress-yellow)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Repository, HACS, And Branding Plan
 
@@ -56,9 +56,9 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Rewrite `README.md` into the user-oriented structure required by the PRD, including HACS and manual installation instructions that copy only `custom_components/occupancy_duration`. |  |  |
-| TASK-008 | Document the integration differentiator in `README.md`: capability-aware occupancy sessions with adaptive decay rather than naive motion timers. |  |  |
-| TASK-009 | Document repository URLs, issue tracker, release expectations, compatibility floor, diagnostics, and development workflow in `README.md`. |  |  |
+| TASK-007 | Rewrite `README.md` into the user-oriented structure required by the PRD, including HACS and manual installation instructions that copy only `custom_components/occupancy_duration`. | ✅ | 2026-09-20 |
+| TASK-008 | Document the integration differentiator in `README.md`: capability-aware occupancy sessions with adaptive decay rather than naive motion timers. | ✅ | 2026-09-20 |
+| TASK-009 | Document repository URLs, issue tracker, release expectations, compatibility floor, diagnostics, and development workflow in `README.md`. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Local Brand Assets
 
@@ -66,9 +66,9 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-010 | Create `custom_components/occupancy_duration/brand/icon.png` and `custom_components/occupancy_duration/brand/icon@2x.png` with the required square sizes and transparent-background preference. |  |  |
-| TASK-011 | Create `custom_components/occupancy_duration/brand/logo.png` and `custom_components/occupancy_duration/brand/logo@2x.png` with the required landscape proportions. |  |  |
-| TASK-012 | Validate that all brand assets avoid Home Assistant official branding and remain legible at small sizes. |  |  |
+| TASK-010 | Create `custom_components/occupancy_duration/brand/icon.png` and `custom_components/occupancy_duration/brand/icon@2x.png` with the required square sizes and transparent-background preference. | ✅ | 2026-09-20 |
+| TASK-011 | Create `custom_components/occupancy_duration/brand/logo.png` and `custom_components/occupancy_duration/brand/logo@2x.png` with the required landscape proportions. | ✅ | 2026-09-20 |
+| TASK-012 | Validate that all brand assets avoid Home Assistant official branding and remain legible at small sizes. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 5 - Metadata Consistency Check
 
@@ -76,8 +76,8 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-013 | Verify that `manifest.json`, `hacs.json`, `README.md`, and brand assets reference the same integration name, domain, repository URL, and compatibility floor. |  |  |
-| TASK-014 | Record any deviation from the PRD caused by updated upstream guidance, such as the explicit `integration_type: helper` recommendation, directly in documentation comments or plan updates. |  |  |
+| TASK-013 | Verify that `manifest.json`, `hacs.json`, `README.md`, and brand assets reference the same integration name, domain, repository URL, and compatibility floor. | ✅ | 2026-09-20 |
+| TASK-014 | Record any deviation from the PRD caused by updated upstream guidance, such as the explicit `integration_type: helper` recommendation, directly in documentation comments or plan updates. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 6 - Workspace Hygiene And Local Tooling
 

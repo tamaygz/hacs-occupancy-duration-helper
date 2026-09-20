@@ -99,11 +99,11 @@ Initial shape:
   "domain": "occupancy_duration",
   "name": "Occupancy Duration Helper",
   "codeowners": [
-    "@tamaysgz"
+    "@tamaygz"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/tamaysgz/hacs-occupancy-duration-helper",
-  "issue_tracker": "https://github.com/tamaysgz/hacs-occupancy-duration-helper/issues",
+  "documentation": "https://github.com/tamaygz/hacs-occupancy-duration-helper",
+  "issue_tracker": "https://github.com/tamaygz/hacs-occupancy-duration-helper/issues",
   "iot_class": "local_push",
   "version": "0.1.0"
 }

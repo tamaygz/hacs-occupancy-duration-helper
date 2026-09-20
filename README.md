@@ -1,43 +1,301 @@
-Home Assistant custom integration that turns motion and presence sensors into persistent occupancy sessions with duration tracking, configurable stages, and adaptive decay.
+# Occupancy Duration Helper
 
-home-assistant
-home-assistant-integration
-hacs
-hacs-integration
-occupancy
-presence
-motion-sensor
-occupancy-detection
-presence-detection
-occupancy-duration
-motion-detection
-home-automation
-home-assistant-custom-component
-home-assistant-custom-integration
+[![GitHub Release][releases-shield]][releases]
+[![hacs][hacs-shield]][hacs]
+[![License][license-shield]](LICENSE)
 
+> Home Assistant custom integration that turns motion and presence sensors into **persistent occupancy sessions** with duration tracking, configurable stages, and adaptive decay.
 
-Home Assistant integration for duration-aware occupancy sessions from motion and presence sensors, with configurable stages and adaptive decay.
+---
 
+## What It Does
 
-Home Assistant
-HACS
-occupancy
-occupancy duration
-occupancy helper
-presence
-presence detection
-motion sensor
-motion detection
-motion persistence
-room occupancy
-room presence
-occupancy session
-presence session
-session duration
-activity duration
-stationary presence
-motion timeout
-adaptive decay
+Standard motion sensors measure whether motion *is happening right now*. They do not measure how long a space has been occupied, and a single clear signal (motion sensor turning OFF) may not mean the person has actually left.
+
+**Occupancy Duration Helper** bridges this gap by:
+
+1. Inspecting your source sensor to understand its actual capabilities (continuous ON/OFF, event-only, explicit occupancy, mmWave presence, etc.)
+2. Starting a persistent **occupancy session** the moment evidence of activity arrives
+3. Keeping the session alive as long as the sensor confirms continued activity — without restarting the clock on every new event
+4. Applying **configurable exponential decay** only when the sensor genuinely goes inactive
+5. Exposing the result as native Home Assistant entities for use in automations and dashboards
+
+The integration does not treat `motion OFF` as `person left`. It treats motion as *evidence* of occupancy and evaluates that evidence continuously.
+
+---
+
+## Features
+
+- **Sensor capability detection** — inspects each source and adapts behavior automatically for PIR, mmWave, event-only, and explicit occupancy sensors
+- **Persistent sessions** — duration starts when an interaction begins and runs continuously until the session is closed
+- **Adaptive decay** — score-based exponential decay with configurable half-life; decay is suppressed while the source still shows activity
+- **Dynamic source re-check** — during a decaying session the integration re-reads the source to prevent premature closure
+- **Configurable duration stages** — define Short / Medium / Long (or any custom stages) with per-stage decay rates
+- **Automatic strategy selection** — chooses the most appropriate behavior for your sensor type with a UI override option
+- **Session persistence** — active sessions survive Home Assistant restarts
+- **Full UI configuration** — set up and reconfigure entirely from Settings → Devices & services
+- **Diagnostic export** — download a full capability and session report from the Home Assistant UI
+
+---
+
+## How It Works
+
+```
+Source sensor
+     │
+     ▼
+Capability inspection
+     │
+     ▼
+Strategy selection  ←──── User override (optional)
+     │
+     ▼
+Occupancy session engine
+  ┌──────────────────────────────────────┐
+  │  IDLE → ACTIVE → DECAYING → ENDING  │
+  │              ↑___────┘              │
+  │                                      │
+  │  score(t) = score₀ × 2^(-t / T½)   │
+  └──────────────────────────────────────┘
+     │
+     ▼
+Duration sensor · Occupancy binary sensor · Stage sensor
+```
+
+### Strategy modes
+
+| Mode | Used when |
+|---|---|
+| Native occupancy | Source explicitly reports occupied / clear |
+| Continuous motion | Source is a binary ON/OFF motion sensor |
+| Event-only | Source fires events with no persistent state |
+| Hybrid | Source exposes both motion and occupancy |
+| Auto (default) | Integration selects from the above automatically |
+
+---
+
+## Requirements / Compatibility
+
+- **Home Assistant** ≥ 2026.3.0
+- **Python** ≥ 3.14 (included with supported Home Assistant installations)
+- No third-party Python packages required
+
+---
+
+## Installation
+
+### HACS (recommended)
+
+1. Open HACS in Home Assistant.
+2. Go to **Integrations**.
+3. Search for **Occupancy Duration Helper**.
+4. Click **Download**.
+5. Restart Home Assistant if prompted.
+6. Go to **Settings → Devices & services → Add Integration** and search for **Occupancy Duration Helper**.
+
+### Manual
+
+1. Download or clone this repository.
+2. Copy the `custom_components/occupancy_duration` folder into:
+   ```
+   /config/custom_components/occupancy_duration
+   ```
+3. Restart Home Assistant.
+4. Go to **Settings → Devices & services → Add Integration** and search for **Occupancy Duration Helper**.
+
+---
+
+## Configuration
+
+Add the integration from the UI. The setup flow asks for:
+
+1. **Name** — used to name the entities
+2. **Source entity** — any motion, occupancy, or presence binary sensor / sensor / event entity
+3. **Capability preview** — detected sensor behavior is shown; choose whether to accept the recommendation
+4. **Sensor strategy** — normally selected automatically; override here for special cases
+5. **Decay settings** — pick Fast / Normal / Slow or enter a custom half-life in seconds
+6. **End threshold** — activity score below which the session moves to ending state (default 5)
+7. **End grace** — seconds to remain in ending state before closing (default 15)
+8. **Duration stages** (optional) — define named ranges with per-stage decay rates
+
+### Reconfigure
+
+To change the **name** or **source entity**, use the **Reconfigure** option on the integration page.
+
+To change **strategy, decay settings, stages, or restore behavior**, use the **Configure** (options) button.
+
+---
+
+## Sensor Capabilities
+
+The integration inspects each source sensor before creating a session. The capability summary is visible in the config flow and in the diagnostics export.
+
+| Capability | What it means |
+|---|---|
+| Current state available | The source has a readable state that can be queried between events |
+| Motion ON/OFF | The source uses binary semantics where ON means motion is happening |
+| Occupancy state | The source explicitly reports occupied / clear |
+| Presence state | The source explicitly reports presence / absence |
+| Event-only | The source fires events but has no readable persistent state |
+| Re-check during decay | The integration can query the source while decaying to prevent premature closure |
+
+When multiple signals are available (e.g. a device with both motion and occupancy entities), the integration prefers the more semantically authoritative one.
+
+---
+
+## Duration Stages
+
+Stages let you attach meaning to how long the space has been occupied. Example:
+
+| Stage | Duration | Decay half-life |
+|---|---|---|
+| Short | 0 – 60 s | 30 s |
+| Medium | 60 – 180 s | 60 s |
+| Long | 180 s+ | 180 s |
+
+Stages are monotonic: once a session reaches **Long**, it does not return to **Medium** even if motion stops. The stage represents *elapsed interaction time*, not motion intensity.
+
+---
+
+## Entities
+
+### Duration sensor
+
+```
+sensor.<name>_duration
+```
+
+State: seconds (integer, wall-clock duration since session started)
+
+| Attribute | Value |
+|---|---|
+| `active` | `true` while session is open |
+| `started_at` | ISO 8601 timestamp |
+| `last_activity_at` | ISO 8601 timestamp |
+| `stage` | Current stage name or `none` |
+| `session_state` | `idle` / `active` / `decaying` / `ending` / `closed` |
+| `score` | Activity score 0–100 |
+
+### Occupancy binary sensor
+
+```
+binary_sensor.<name>_occupancy
+```
+
+Device class: `occupancy`. ON while a session is open, OFF when idle.
+
+### Stage sensor
+
+```
+sensor.<name>_stage
+```
+
+State: current stage name (e.g. `short`, `medium`, `long`). Only created when stages are configured.
+
+---
+
+## Automation Examples
+
+### Trigger when a bathroom visit becomes a long session
+
+```yaml
+trigger:
+  - platform: state
+    entity_id: sensor.bathroom_stage
+    to: long
+action:
+  - service: notify.mobile_app
+    data:
+      message: "Long bathroom visit detected"
+```
+
+### Turn off the light only when occupancy is truly gone
+
+```yaml
+trigger:
+  - platform: state
+    entity_id: binary_sensor.bathroom_occupancy
+    to: "off"
+action:
+  - service: light.turn_off
+    target:
+      entity_id: light.bathroom
+```
+
+---
+
+## Troubleshooting
+
+**Session ends too quickly**
+→ Check the detected strategy in Diagnostics. If the source is continuous (ON while motion occurs), the session should not decay while the sensor is ON. A strategy mismatch can cause premature closure.
+
+**Session never ends**
+→ Increase the end threshold or reduce the decay half-life for the last stage.
+
+**Duration resets unexpectedly**
+→ This should not happen. Open a [GitHub issue][issues] with a diagnostics download attached.
+
+**Integration not loading after restart**
+→ Check Home Assistant logs for errors from the `occupancy_duration` domain.
+
+---
+
+## Diagnostics
+
+Download a full diagnostic report from **Settings → Devices & services → Occupancy Duration Helper → Download diagnostics**.
+
+The report includes:
+- Source entity and current state
+- Detected capabilities with confidence levels
+- Selected strategy and why it was chosen
+- Current session state, score, stage, and timestamps
+- Decay configuration
+
+This file does not include secrets or sensitive credentials.
+
+---
+
+## Development
+
+Requirements: Python 3.14, pip.
+
+```sh
+git clone https://github.com/tamaygz/hacs-occupancy-duration-helper
+cd hacs-occupancy-duration-helper
+pip install -e ".[dev]"
+pytest
+```
+
+Linting and formatting:
+
+```sh
+python -m ruff check .
+python -m ruff format .
+python -m mypy custom_components tests
+```
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome at <https://github.com/tamaygz/hacs-occupancy-duration-helper/issues>.
+
+Please include a diagnostics download when reporting bugs.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+---
+
+[releases-shield]: https://img.shields.io/github/release/tamaygz/hacs-occupancy-duration-helper.svg?style=flat-square
+[releases]: https://github.com/tamaygz/hacs-occupancy-duration-helper/releases
+[hacs-shield]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=flat-square
+[hacs]: https://hacs.xyz
+[license-shield]: https://img.shields.io/github/license/tamaygz/hacs-occupancy-duration-helper.svg?style=flat-square
+[issues]: https://github.com/tamaygz/hacs-occupancy-duration-helper/issues
 occupancy decay
 presence timeout
 PIR

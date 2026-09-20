@@ -23,8 +23,8 @@ It is derived from both source documents in `docs/PRD/` and cross-checked agains
   - [../PRD/initial_hacs_setup.md](../PRD/initial_hacs_setup.md)
 - Workspace execution prompt present:
   - `.github/prompts/execplan.prompt.md`
-- Current implementation assets missing:
-  - `custom_components/occupancy_duration/brand/`
+- Current implementation assets complete: `custom_components/occupancy_duration/`, `hacs.json`, `pyproject.toml`, `LICENSE`, `README.md`, brand placeholders
+- Brand assets in `custom_components/occupancy_duration/brand/` are minimal 1×1 PNG placeholders — **must be replaced with real artwork before v0.1.0 release**
 
 ## Plan Tracking
 
@@ -34,7 +34,7 @@ It is derived from both source documents in `docs/PRD/` and cross-checked agains
 | [feature-session-and-decay-engine-1.md](./feature-session-and-decay-engine-1.md) | Session lifecycle, scoring, decay, duration stages, scheduler contracts | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-config-and-options-flow-1.md](./feature-config-and-options-flow-1.md) | Config flow, reconfigure/options split, selectors, translations, UX validation | Planned | 0 | 11 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-entities-persistence-and-observability-1.md](./feature-entities-persistence-and-observability-1.md) | Entities, coordinator wiring, restore, diagnostics, HA events, unload behavior | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Session/decay plan; config flow plan |
-| [infrastructure-repository-hacs-and-branding-1.md](./infrastructure-repository-hacs-and-branding-1.md) | Repository scaffold, manifest, HACS metadata, README, pyproject, brand assets | In progress | 8 | 8 | Added `pyproject.toml`, `LICENSE`, and reserved `tests/`; aligned minimum Home Assistant compatibility to `2026.3.0` for local branding and Python 3.14 | None |
+| [infrastructure-repository-hacs-and-branding-1.md](./infrastructure-repository-hacs-and-branding-1.md) | Repository scaffold, manifest, HACS metadata, README, pyproject, brand assets | Completed | 16 | 0 | All phases done: scaffold, metadata, pyproject, LICENSE, README, brand asset placeholders, metadata consistency check | None |
 | [process-quality-validation-and-release-1.md](./process-quality-validation-and-release-1.md) | Tests, CI, issue templates, validation gates, release workflow, HACS readiness | Planned | 0 | 13 | Initial plan created from PRD and current HA/HACS docs | All other plans |
 
 ## Execution Order
