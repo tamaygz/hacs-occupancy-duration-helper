@@ -166,6 +166,33 @@ def test_validate_stage_payload_rejects_overlap_with_open_ended_existing() -> No
         raise AssertionError("expected stage_overlap")
 
 
+def test_validate_stage_payload_rejects_new_open_ended_overlapping_existing_open_ended() -> None:
+    existing = [
+        {
+            CONF_STAGE_ID: "long",
+            CONF_STAGE_NAME: "Long",
+            CONF_STAGE_MIN_DURATION: 180,
+            CONF_STAGE_MAX_DURATION: None,
+            CONF_STAGE_HALF_LIFE: None,
+        }
+    ]
+    try:
+        validate_stage_payload(
+            {
+                CONF_STAGE_ID: "wider",
+                CONF_STAGE_NAME: "Wider",
+                CONF_STAGE_MIN_DURATION: 0,
+                CONF_STAGE_MAX_DURATION: None,
+                CONF_STAGE_HALF_LIFE: None,
+            },
+            existing,
+        )
+    except ValueError as err:
+        assert str(err) == "stage_overlap"
+    else:
+        raise AssertionError("expected stage_overlap")
+
+
 def test_source_change_requires_reset_when_source_changes() -> None:
     config_entry = MagicMock()
     config_entry.data = {

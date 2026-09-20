@@ -150,9 +150,8 @@ def validate_stage_payload(
         new_max = normalised[CONF_STAGE_MAX_DURATION]
         if existing_max is None:
             # Existing stage is open-ended: covers [existing_min, ∞).
-            # New stage overlaps if it starts at or after existing_min,
-            # or if it extends into the existing stage's range.
-            if new_min >= existing_min or (new_max is not None and new_max > existing_min):
+            # New stage overlaps unless it ends at or before existing_min.
+            if new_max is None or new_max > existing_min:
                 raise ValueError("stage_overlap")
         elif new_min < existing_max and (new_max is None or new_max > existing_min):
             raise ValueError("stage_overlap")
