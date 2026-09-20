@@ -22,7 +22,6 @@ from .const import (
     DATA_COORDINATOR,
     DOMAIN,
 )
-from .coordinator import OccupancyDurationCoordinator, RuntimeSnapshot
 
 PARALLEL_UPDATES = 0
 
@@ -43,10 +42,7 @@ class OccupancyBaseEntity(CoordinatorEntity[OccupancyDurationCoordinator]):
     """Shared entity behavior for occupancy helper coordinator entities."""
 
     _attr_has_entity_name = True
-
-    @property
-    def available(self) -> bool:
-        return self.coordinator.data is not None
+    _attr_should_poll = False
 
 
 class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):

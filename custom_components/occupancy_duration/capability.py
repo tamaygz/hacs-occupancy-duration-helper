@@ -171,7 +171,7 @@ def inspect_capabilities(
     has_state = state is not None and state not in ("unavailable", "unknown")
     current_state = CapabilityFinding(
         present=has_state,
-        confidence=CapabilityConfidence.CONFIRMED if has_state else CapabilityConfidence.CONFIRMED,
+        confidence=CapabilityConfidence.CONFIRMED,
         rationale="entity state is readable and not unavailable/unknown" if has_state
         else "entity state unavailable or unknown",
     )

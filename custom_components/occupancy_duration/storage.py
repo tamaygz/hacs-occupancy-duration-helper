@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -10,6 +11,8 @@ from homeassistant.helpers.storage import Store
 
 from .const import STORAGE_KEY, STORAGE_VERSION
 from .session import OccupancySession, SessionState
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def serialize_session(session: OccupancySession | None) -> dict[str, Any] | None:
@@ -32,24 +35,28 @@ def deserialize_session(payload: dict[str, Any] | None) -> OccupancySession | No
     """Deserialize a session from persisted data."""
     if not payload:
         return None
-    return OccupancySession(
-        id=payload["id"],
-        started_at=datetime.fromisoformat(payload["started_at"]),
-        last_activity_at=datetime.fromisoformat(payload["last_activity_at"]),
-        last_active_signal_at=(
-            datetime.fromisoformat(payload["last_active_signal_at"])
-            if payload.get("last_active_signal_at")
-            else None
-        ),
-        ended_at=(
-            datetime.fromisoformat(payload["ended_at"])
-            if payload.get("ended_at")
-            else None
-        ),
-        score=float(payload["score"]),
-        stage=payload.get("stage"),
-        state=SessionState(payload["state"]),
-    )
+    try:
+        return OccupancySession(
+            id=payload["id"],
+            started_at=datetime.fromisoformat(payload["started_at"]),
+            last_activity_at=datetime.fromisoformat(payload["last_activity_at"]),
+            last_active_signal_at=(
+                datetime.fromisoformat(payload["last_active_signal_at"])
+                if payload.get("last_active_signal_at")
+                else None
+            ),
+            ended_at=(
+                datetime.fromisoformat(payload["ended_at"])
+                if payload.get("ended_at")
+                else None
+            ),
+            score=float(payload["score"]),
+            stage=payload.get("stage"),
+            state=SessionState(payload["state"]),
+        )
+    except (KeyError, ValueError) as exc:
+        _LOGGER.warning("Discarding malformed persisted session: %s", exc)
+        return None
 
 
 class SessionStore:

@@ -375,6 +375,8 @@ class OccupancyDurationConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(step_id="reconfigure", data_schema=data_schema, errors=errors)
 
     def _create_entry(self):
+        if not self._source_entity:
+            raise RuntimeError("_create_entry called before source_entity was set")
         options = build_entry_options(
             strategy=self._strategy,
             default_half_life=self._default_half_life,
@@ -385,7 +387,7 @@ class OccupancyDurationConfigFlow(ConfigFlow, domain=DOMAIN):
         )
         return self.async_create_entry(
             title=self._name,
-            data=build_entry_data(name=self._name, source_entity=self._source_entity or ""),
+            data=build_entry_data(name=self._name, source_entity=self._source_entity),
             options=options,
         )
 

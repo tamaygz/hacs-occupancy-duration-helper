@@ -213,8 +213,20 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
     def _source_is_unavailable(self, state: str | None) -> bool:
         return state in (None, STATE_UNAVAILABLE, STATE_UNKNOWN)
 
-    def _source_is_active(self, capability_summary: CapabilitySummary, state: str | None) -> tuple[bool, bool]:
+    def _source_is_active(
+        self,
+        capability_summary: CapabilitySummary,
+        state: str | None,
+        strategy: StrategyMode,
+    ) -> tuple[bool, bool]:
+        """Return (is_active, is_authoritative) for the current source state.
+
+        Event-only sources never have a readable active state.
+        """
         if self._source_is_unavailable(state):
+            return False, False
+        # Event-only sensors have no persistent state to query.
+        if strategy == StrategyMode.EVENT_ONLY:
             return False, False
         normalised = str(state).lower()
         caps = capability_summary.capabilities
@@ -228,7 +240,9 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         source_state: str | None,
     ) -> tuple[OccupancySession | None, str]:
         now = datetime.now(UTC)
-        source_active, authoritative = self._source_is_active(capability_summary, source_state)
+        source_active, authoritative = self._source_is_active(
+            capability_summary, source_state, strategy=self.strategy
+        )
 
         if restored is None:
             if source_active:
@@ -276,7 +290,9 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
 
         new_state_obj = event.data.get("new_state")
         source_state = new_state_obj.state if new_state_obj else None
-        source_active, authoritative = self._source_is_active(self.data.capability_summary, source_state)
+        source_active, authoritative = self._source_is_active(
+            self.data.capability_summary, source_state, strategy=self.data.strategy
+        )
         now = datetime.now(UTC)
         session = self.data.session
 

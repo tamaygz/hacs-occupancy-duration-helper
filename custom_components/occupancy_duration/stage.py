@@ -62,39 +62,32 @@ def resolve_stage(
     if not stages:
         return None
 
-    # validate_stages is O(n) and called on every decode-tick; callers that build
-    # stages from persisted config validate once at config load.
+    # Single pass: find the matching stage and track the last candidate for the
+    # gap/fallback case without a second iteration.
     matched: DurationStage | None = None
-    for stage in stages:
-        if stage.contains(duration_seconds):
+    last_eligible: DurationStage | None = None
+    current_index: int | None = None
+
+    for index, stage in enumerate(stages):
+        if stage.id == current_stage_id:
+            current_index = index
+        if stage.min_duration <= duration_seconds:
+            last_eligible = stage
+        if stage.contains(duration_seconds) and matched is None:
             matched = stage
-            break
 
-    if matched is None:
-        # Duration is before the first stage or in a deliberate gap; return the
-        # highest-min stage that does not exceed duration_seconds.
-        candidates = [s for s in stages if s.min_duration <= duration_seconds]
-        return candidates[-1] if candidates else None
+    resolved = matched if matched is not None else last_eligible
 
-    if current_stage_id is None:
-        return matched
+    if resolved is None or current_stage_id is None:
+        return resolved
 
-    current_index = next(
-        (index for index, stage in enumerate(stages) if stage.id == current_stage_id),
+    resolved_index = next(
+        (i for i, s in enumerate(stages) if s.id == resolved.id),
         None,
     )
-    matched_index = next(
-        (index for index, stage in enumerate(stages) if stage.id == matched.id),
-        None,
-    )
-
-    if current_index is None or matched_index is None:
-        return matched
-
-    if matched_index < current_index:
+    if current_index is not None and resolved_index is not None and resolved_index < current_index:
         return stages[current_index]
-
-    return matched
+    return resolved
 
 
 def get_stage_by_id(stage_id: str | None, stages: list[DurationStage]) -> DurationStage | None:
