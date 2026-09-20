@@ -1,6 +1,6 @@
 # Initial HACS Setup — Occupancy Duration Helper
 
-**Repository:** `tamaysgz/hacs-occupancy-duration-helper`  
+**Repository:** `tamaygz/hacs-occupancy-duration-helper`  
 **Integration:** Occupancy Duration Helper  
 **Repository type:** Home Assistant custom integration distributed through HACS  
 **Audience:** Coding agent implementing the initial repository/HACS structure
