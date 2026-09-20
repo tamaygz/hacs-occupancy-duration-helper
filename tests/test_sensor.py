@@ -7,7 +7,14 @@ from unittest.mock import MagicMock
 
 from custom_components.occupancy_duration.binary_sensor import OccupancyBinarySensor
 from custom_components.occupancy_duration.const import DOMAIN
-from custom_components.occupancy_duration.sensor import OccupancyDurationSensor, OccupancyDurationStageSensor
+from custom_components.occupancy_duration.sensor import (
+    OccupancyActivityScoreSensor,
+    OccupancyDurationSensor,
+    OccupancyDurationStageSensor,
+    OccupancyLastActivitySensor,
+    OccupancySessionStartedSensor,
+    OccupancyStrategySensor,
+)
 from custom_components.occupancy_duration.session import SessionState, start_session
 
 
@@ -86,3 +93,23 @@ def test_entities_expose_shared_device_info() -> None:
 
     assert duration.device_info["identifiers"] == {(DOMAIN, "entry-id")}
     assert occupancy.device_info["identifiers"] == {(DOMAIN, "entry-id")}
+
+
+def test_diagnostic_sensors_are_enabled_and_populated_by_default() -> None:
+    coordinator = _coordinator_with_session(stage="long")
+    coordinator.data.strategy = MagicMock(value="continuous_motion")
+    entry = MagicMock(entry_id="entry-id", title="Bathroom")
+
+    activity = OccupancyActivityScoreSensor(coordinator, entry)
+    strategy = OccupancyStrategySensor(coordinator, entry)
+    last_activity = OccupancyLastActivitySensor(coordinator, entry)
+    session_started = OccupancySessionStartedSensor(coordinator, entry)
+
+    assert activity.entity_registry_enabled_default is True
+    assert strategy.entity_registry_enabled_default is True
+    assert last_activity.entity_registry_enabled_default is True
+    assert session_started.entity_registry_enabled_default is True
+    assert activity.native_value == 100.0
+    assert strategy.native_value == "continuous_motion"
+    assert last_activity.native_value is not None
+    assert session_started.native_value is not None

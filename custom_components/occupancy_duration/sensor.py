@@ -131,13 +131,12 @@ class OccupancyDurationStageSensor(OccupancyBaseEntity, SensorEntity):
 
 
 class OccupancyActivityScoreSensor(OccupancyBaseEntity, SensorEntity):
-    """Diagnostic: exposes the raw activity score (0–100). Disabled by default."""
+    """Diagnostic: exposes the raw activity score (0–100)."""
 
     _attr_name = "Activity score"
     _attr_native_unit_of_measurement = "%"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry, "activity_score")
@@ -151,11 +150,10 @@ class OccupancyActivityScoreSensor(OccupancyBaseEntity, SensorEntity):
 
 
 class OccupancyStrategySensor(OccupancyBaseEntity, SensorEntity):
-    """Diagnostic: exposes the active sensor strategy. Disabled by default."""
+    """Diagnostic: exposes the active sensor strategy."""
 
     _attr_name = "Sensor strategy"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry, "sensor_strategy")
@@ -168,12 +166,11 @@ class OccupancyStrategySensor(OccupancyBaseEntity, SensorEntity):
 
 
 class OccupancyLastActivitySensor(OccupancyBaseEntity, SensorEntity):
-    """Diagnostic: timestamp of the last recorded activity. Disabled by default."""
+    """Diagnostic: timestamp of the last recorded activity."""
 
     _attr_name = "Last activity"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry, "last_activity")
@@ -187,12 +184,11 @@ class OccupancyLastActivitySensor(OccupancyBaseEntity, SensorEntity):
 
 
 class OccupancySessionStartedSensor(OccupancyBaseEntity, SensorEntity):
-    """Diagnostic: timestamp when the current session started. Disabled by default."""
+    """Diagnostic: timestamp when the current session started."""
 
     _attr_name = "Session started"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry, "session_started")

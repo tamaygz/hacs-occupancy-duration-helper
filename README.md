@@ -266,6 +266,8 @@ action:
 
 Download a full diagnostic report from **Settings → Devices & services → Occupancy Duration Helper → Download diagnostics**.
 
+The helper also exposes diagnostic-category entities in Home Assistant for score, strategy, and session timestamps.
+
 The report includes:
 - Source entity and current state
 - Detected capabilities with confidence levels
