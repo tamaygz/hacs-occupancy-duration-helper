@@ -50,6 +50,17 @@ from .const import (
 
 STAGE_ADD_ANOTHER = "add_another"
 STAGE_ADD_STAGES = "add_stages"
+STAGE_CLEAR_ALL = "clear_all_stages"
+STAGE_DONE = "done_adding_stages"
+
+# Maps raw strategy enum values to human-readable labels for UI display.
+_STRATEGY_LABELS: dict[str, str] = {
+    StrategyMode.AUTO.value: "Automatic",
+    StrategyMode.NATIVE_OCCUPANCY.value: "Native occupancy",
+    StrategyMode.CONTINUOUS_MOTION.value: "Continuous motion",
+    StrategyMode.EVENT_ONLY.value: "Event-only motion",
+    StrategyMode.HYBRID.value: "Hybrid occupancy + motion",
+}
 
 
 def _suggested_options(config_entry: ConfigEntry, key: str, default: Any) -> Any:
@@ -155,10 +166,11 @@ def source_change_requires_reset(config_entry: ConfigEntry, new_source_entity: s
 
 
 def _strategy_selector() -> SelectSelector:
+    # label uses human-readable name so the selector is intelligible without translations loaded.
     return SelectSelector(
         SelectSelectorConfig(
             options=[
-                SelectOptionDict(value=mode.value, label=mode.value)
+                SelectOptionDict(value=mode.value, label=_STRATEGY_LABELS[mode.value])
                 for mode in StrategyMode
             ],
             translation_key="strategy",
@@ -254,7 +266,10 @@ class OccupancyDurationConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({}),
             description_placeholders={
                 "summary": _capability_summary_text(self._capability_summary),
-                "strategy": self._capability_summary.recommended_strategy.value,
+                "strategy": _STRATEGY_LABELS.get(
+                    self._capability_summary.recommended_strategy.value,
+                    self._capability_summary.recommended_strategy.value,
+                ),
             },
         )
 
@@ -399,11 +414,24 @@ class OccupancyDurationOptionsFlow(OptionsFlowWithReload):
         self._config_entry = config_entry
         self._stages: list[dict[str, Any]] = list(config_entry.options.get(CONF_STAGES, []))
 
+    def _stages_summary(self) -> str:
+        if not self._stages:
+            return "None configured"
+        lines = []
+        for s in self._stages:
+            name = s.get(CONF_STAGE_NAME) or s.get(CONF_STAGE_ID, "?")
+            min_d = s.get(CONF_STAGE_MIN_DURATION, 0)
+            max_d = s.get(CONF_STAGE_MAX_DURATION)
+            max_str = f"{max_d}s" if max_d else "\u221e"
+            lines.append(f"\u2022 {name}: {min_d}\u2013{max_str}")
+        return "\n".join(lines)
+
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            stages = self._stages
+            if user_input.get(STAGE_CLEAR_ALL):
+                self._stages = []
             if user_input.get(STAGE_ADD_STAGES):
                 return await self.async_step_stage()
             return self.async_create_entry(
@@ -413,7 +441,7 @@ class OccupancyDurationOptionsFlow(OptionsFlowWithReload):
                     end_threshold=int(user_input[CONF_END_THRESHOLD]),
                     end_grace=int(user_input[CONF_END_GRACE]),
                     restore_session=bool(user_input[CONF_RESTORE_SESSION]),
-                    stages=stages,
+                    stages=self._stages,
                 )
             )
 
@@ -440,14 +468,22 @@ class OccupancyDurationOptionsFlow(OptionsFlowWithReload):
                     default=_suggested_options(self._config_entry, CONF_RESTORE_SESSION, DEFAULT_RESTORE_SESSION),
                 ): BooleanSelector(),
                 vol.Required(STAGE_ADD_STAGES, default=False): BooleanSelector(),
+                vol.Required(STAGE_CLEAR_ALL, default=False): BooleanSelector(),
             }
         )
-        return self.async_show_form(step_id="init", data_schema=data_schema, errors=errors)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={"current_stages": self._stages_summary()},
+        )
 
     async def async_step_stage(self, user_input: dict[str, Any] | None = None):
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            if user_input.get(STAGE_DONE):
+                return await self.async_step_init()
             try:
                 stage = validate_stage_payload(user_input, self._stages)
             except ValueError as err:
@@ -472,6 +508,7 @@ class OccupancyDurationOptionsFlow(OptionsFlowWithReload):
                     NumberSelectorConfig(min=1, max=86400, mode=NumberSelectorMode.BOX)
                 ),
                 vol.Required(STAGE_ADD_ANOTHER, default=False): BooleanSelector(),
+                vol.Required(STAGE_DONE, default=False): BooleanSelector(),
             }
         )
         return self.async_show_form(step_id="stage", data_schema=data_schema, errors=errors)

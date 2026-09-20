@@ -13,7 +13,7 @@
       },
       "capability_preview": {
         "title": "Capability preview",
-        "description": "Detected capabilities:\n{summary}\n\nRecommended strategy: {strategy}"
+        "description": "Detected capabilities:\n{summary}\n\nRecommended strategy: {strategy}\n\nContinue to confirm, or choose a different strategy on the next step."
       },
       "strategy": {
         "title": "Strategy",
@@ -24,13 +24,20 @@
       },
       "decay": {
         "title": "Decay settings",
-        "description": "Configure default decay, threshold, grace period, restore behavior, and whether to add stages.",
+        "description": "Configure how quickly activity fades and how sessions end.",
         "data": {
           "default_half_life": "Default half-life (seconds)",
-          "end_threshold": "End threshold",
-          "end_grace": "End grace (seconds)",
+          "end_threshold": "End threshold (0\u201300)",
+          "end_grace": "End grace period (seconds)",
           "restore_session": "Restore session after restart",
           "add_stages": "Add duration stages"
+        },
+        "data_description": {
+          "default_half_life": "How fast activity fades when the source is inactive. 30 s = fast decay, 60 s = normal, 180 s = slow. Lower values end sessions sooner after the last event.",
+          "end_threshold": "Score (0\u2013100) below which the session moves to the ending state. The default of 5 means the session ends when almost no evidence of activity remains.",
+          "end_grace": "Seconds the session stays in the ending state before it closes completely. A brief window to catch one final event.",
+          "restore_session": "When enabled, an active or decaying session is restored across Home Assistant restarts.",
+          "add_stages": "Optionally define named time ranges (e.g. Short, Medium, Long) with different decay rates per stage."
         }
       },
       "stage": {
@@ -69,26 +76,45 @@
     "step": {
       "init": {
         "title": "Options",
-        "description": "Adjust runtime behavior for this helper.",
+        "description": "Current duration stages:\n{current_stages}\n\nAdjust runtime behavior or manage stages below.",
         "data": {
           "strategy": "Strategy",
           "default_half_life": "Default half-life (seconds)",
-          "end_threshold": "End threshold",
-          "end_grace": "End grace (seconds)",
+          "end_threshold": "End threshold (0\u2013100)",
+          "end_grace": "End grace period (seconds)",
           "restore_session": "Restore session after restart",
-          "add_stages": "Add duration stages"
+          "add_stages": "Add more stages",
+          "clear_all_stages": "Clear all stages"
+        },
+        "data_description": {
+          "default_half_life": "How fast activity fades when the source is inactive. 30 s = fast, 60 s = normal, 180 s = slow.",
+          "end_threshold": "Score (0\u2013100) below which the session enters the ending state. Lower values keep sessions alive longer after the last event.",
+          "end_grace": "Seconds the session stays in the ending state before closing completely.",
+          "restore_session": "Reopen an active session after Home Assistant restarts.",
+          "add_stages": "Add one or more duration stages to the current list.",
+          "clear_all_stages": "Remove all currently configured duration stages. This takes effect when you save."
         }
       },
       "stage": {
         "title": "Add duration stage",
-        "description": "Define one stage. You can add another stage afterward.",
+        "description": "Define one stage. Check \"Done\" to return without adding.",
         "data": {
           "id": "Stage ID",
           "name": "Stage name",
           "min_duration": "Minimum duration (seconds)",
           "max_duration": "Maximum duration (seconds)",
           "half_life": "Stage half-life (seconds)",
-          "add_another": "Add another stage"
+          "add_another": "Add another stage",
+          "done_adding_stages": "Done \u2014 return without adding this stage"
+        },
+        "data_description": {
+          "id": "Short identifier used in automations, e.g. 'short' or 'medium'.",
+          "name": "Label shown in the stage sensor state, e.g. 'Short' or 'Medium'.",
+          "min_duration": "Session must have been open at least this many seconds to enter this stage.",
+          "max_duration": "Leave empty for no upper limit. The last stage is usually unbounded.",
+          "half_life": "Leave empty to inherit the default half-life. Longer half-life = slower decay in this stage.",
+          "add_another": "Check to add another stage immediately after saving this one.",
+          "done_adding_stages": "Check this instead of filling in a stage to return to options without adding."
         }
       }
     },
