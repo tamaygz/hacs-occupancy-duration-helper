@@ -1,8 +1,9 @@
 ---
 name: "execplan"
-description: "Execute one implementation plan, plan section, or planning topic from docs/IMPPLANS with index-aware progress tracking and small-scope iteration"
+description: "Coordinate execution of one implementation plan, plan section, or planning topic from docs/IMPPLANS with index-aware progress tracking, model-aware delegation, and small-scope iteration"
 argument-hint: "<plan file | plan section | topic> [optional focus or constraint]"
 agent: "agent"
+model: ["GPT-5 (copilot)", "Claude Sonnet 4.6 (copilot)"]
 ---
 
 Execute the requested implementation slice from the planning system for this repository.
@@ -16,6 +17,16 @@ Primary control files:
 The user argument is:
 
 `{{input}}`
+
+Coordinator operating mode:
+- Treat the selected prompt model as the coordinator. Its job is to resolve scope, break work into bounded slices, choose the right agent shape for each slice, integrate results, and decide validation.
+- Prefer delegating concrete execution slices to subagents when the slice is clearly bounded enough to hand off without reopening scope.
+- Assign the cheapest viable model to each subagent. For easy, clearly scoped, low-risk tasks such as focused search, nearby code reads, single-file doc edits, small implementation edits, or narrow validation, prefer a low-cost model such as a Haiku-class model or another cheaper available option.
+- For medium-complexity implementation, moderate ambiguity, or validation that needs stronger reasoning, prefer a mid-tier model that is still cheaper than the coordinator when available.
+- Reserve the coordinator's deeper reasoning, or a top-tier delegated model, for ambiguous design, cross-cutting refactors, risky migrations, or when a cheaper delegated pass already failed.
+- Never choose a delegated model more expensive than GPT-5.4 or Claude Sonnet 4.6.
+- When using `runSubagent`, set an explicit model whenever the task is simple enough that a cheaper option is clearly sufficient.
+- Keep delegation narrow: one agent per bounded slice, with a concrete deliverable, expected validation, and no speculative expansion.
 
 Follow this workflow exactly:
 
@@ -37,10 +48,12 @@ Follow this workflow exactly:
    - Do not attempt to execute an entire large plan in one pass unless the user explicitly asks for that and the scope is truly small.
    - Keep edits local, iterative, and easy to validate.
 
-4. Use subagents deliberately.
-   - Use read-only subagents for requirement extraction, nearby code exploration, or targeted comparison when that reduces context load.
+4. Use subagents deliberately and route models by task shape.
+   - Use read-only subagents for requirement extraction, nearby code exploration, targeted comparison, or official-doc lookup when that reduces context load.
+   - Prefer execution subagents for self-contained implementation or validation slices that can be described with a concrete local anchor and a clear success check.
    - Keep subagent tasks narrow and domain-specific.
-   - Do not delegate the main implementation blindly.
+   - Explicitly choose the model for each subagent when the task is clearly easy enough for a cheaper model.
+   - Do not delegate the main implementation blindly; the coordinator remains responsible for scope control, integration, and final acceptance.
 
 5. Re-check best practices when entering a new domain.
    - When the selected slice touches a new Home Assistant, HACS, GitHub Actions, branding, config-flow, storage, diagnostics, or release concern, do a quick web search for current official docs or current best practices before editing.
@@ -78,4 +91,5 @@ Execution priorities:
 When you begin, first state:
 - the resolved target plan or section
 - the immediate implementation slice
+- the coordinator and delegation plan, including the first subagent/model choice when delegation is warranted
 - the first validation check you intend to use after the first edit
