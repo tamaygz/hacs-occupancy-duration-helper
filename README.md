@@ -277,10 +277,6 @@ This file does not include secrets or sensitive credentials.
 
 ---
 
-## Development
-
-Requirements: Python 3.14, pip.
-
 ## Documentation
 
 Additional short guides live in [docs/README.md](./docs/README.md):
@@ -288,6 +284,12 @@ Additional short guides live in [docs/README.md](./docs/README.md):
 - [Configuration Guide](./docs/configuration-guide.md)
 - [Automation Recipes](./docs/automation-recipes.md)
 - [Troubleshooting](./docs/troubleshooting.md)
+
+---
+
+## Development
+
+Requirements: Python 3.14, pip.
 
 ```sh
 git clone https://github.com/tamaygz/hacs-occupancy-duration-helper
