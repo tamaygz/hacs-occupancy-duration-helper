@@ -78,6 +78,15 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 | TASK-013 | Verify that `manifest.json`, `hacs.json`, `README.md`, and brand assets reference the same integration name, domain, repository URL, and compatibility floor. |  |  |
 | TASK-014 | Record any deviation from the PRD caused by updated upstream guidance, such as the explicit `integration_type: helper` recommendation, directly in documentation comments or plan updates. |  |  |
 
+### Implementation Phase 6 - Workspace Hygiene And Local Tooling
+
+- **GOAL-006**: Add repository-local ignore rules and editor tasks that support custom-integration development without introducing user-specific clutter.
+
+| Task | Description | Completed | Date |
+|---|---|---|---|
+| TASK-015 | Create a root-level `.gitignore` tailored to a Home Assistant custom integration, including Python caches, Home Assistant runtime state, local config data, and committed `.vscode/tasks.json` exceptions. | ✅ | 2026-09-20 |
+| TASK-016 | Create `.vscode/tasks.json` with local tasks for compile, test, coverage, lint, format, type-check, and Hassfest validation aligned with custom-integration workflows. | ✅ | 2026-09-20 |
+
 ## Section 3 - Alternatives
 
 - **ALT-001**: Omit `integration_type` and rely on the Home Assistant default - Rejected because current manifest guidance recommends setting the correct type explicitly and `helper` matches the product.
@@ -105,6 +114,8 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 - **FILE-008**: `custom_components/occupancy_duration/brand/icon@2x.png` - created - Add the high-resolution icon asset.
 - **FILE-009**: `custom_components/occupancy_duration/brand/logo.png` - created - Add the standard logo asset.
 - **FILE-010**: `custom_components/occupancy_duration/brand/logo@2x.png` - created - Add the high-resolution logo asset.
+- **FILE-011**: `.gitignore` - created - Ignore Home Assistant runtime artifacts, Python caches, and uncommitted editor state.
+- **FILE-012**: `.vscode/tasks.json` - created - Provide workspace tasks for local validation and development.
 
 ## Section 6 - Testing
 
@@ -113,6 +124,8 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 - **TEST-003**: `README.md` contains all PRD-required sections and the manual installation path points to `/config/custom_components/occupancy_duration` only.
 - **TEST-004**: All four required brand files exist in `custom_components/occupancy_duration/brand/` and are valid PNG assets.
 - **TEST-005**: Repository metadata documents the same domain, integration name, issue tracker, and release links across `manifest.json`, `hacs.json`, and `README.md`.
+- **TEST-006**: `.gitignore` exists, ignores Home Assistant runtime artifacts, and preserves `.vscode/tasks.json` for sharing.
+- **TEST-007**: `.vscode/tasks.json` parses as valid VS Code task JSON and defines compile, test, lint, format, type-check, and Hassfest tasks.
 
 ## Section 7 - Risks & Assumptions
 

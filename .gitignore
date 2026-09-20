@@ -1,0 +1,71 @@
+# Home Assistant configuration and runtime
+config/*
+!config/configuration.yaml
+
+# Custom components used only for local development or HACS-installed dependencies
+custom_components/*
+!custom_components/occupancy_duration/
+
+# Home Assistant local state and secrets
+*.crt
+*.csr
+*.key
+.cloud
+.google.token
+.HA_VERSION
+.storage
+.uuid
+google_calendars.yaml
+home-assistant.db
+home-assistant_v2.db
+home-assistant_v2.db-*
+ip_bans.yaml
+known_devices.yaml
+secrets.yaml
+
+# Logs and runtime artifacts
+*.db-journal
+*.log
+*.pid
+deps/
+lib/
+tts/
+
+# Python caches, environments, coverage, and packaging
+__pycache__/
+*.py[cod]
+*.py,cover
+.coverage
+.hypothesis/
+.mypy_cache/
+.nox/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.venv/
+build/
+coverage.xml
+dist/
+env/
+htmlcov/
+pip-selfcheck.json
+site/
+uv.lock
+venv/
+*.egg
+*.egg-info/
+.eggs/
+
+# Editor and local workspace state
+.history/
+.idea/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
