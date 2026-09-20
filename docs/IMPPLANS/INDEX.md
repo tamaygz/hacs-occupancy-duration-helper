@@ -30,7 +30,7 @@ It is derived from both source documents in `docs/PRD/` and cross-checked agains
 
 | Document | Scope | Status | Completed | Open | Last Work | Depends On |
 |---|---|---|---:|---:|---|---|
-| [feature-capability-and-strategy-1.md](./feature-capability-and-strategy-1.md) | Source inspection, capability model, strategy auto-selection, manual override safety | Planned | 0 | 11 | Initial plan created from PRD and current HA docs | None |
+| [feature-capability-and-strategy-1.md](./feature-capability-and-strategy-1.md) | Source inspection, capability model, strategy auto-selection, manual override safety | Completed | 11 | 0 | Implemented `const.py` (StrategyMode enum + config keys), `capability.py` (CapabilityFinding/SensorCapabilities/SourceSnapshot/CapabilitySummary + full inspection pipeline + strategy recommender + override resolver), and `tests/test_capability.py` (15 focused tests) | None |
 | [feature-session-and-decay-engine-1.md](./feature-session-and-decay-engine-1.md) | Session lifecycle, scoring, decay, duration stages, scheduler contracts | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-config-and-options-flow-1.md](./feature-config-and-options-flow-1.md) | Config flow, reconfigure/options split, selectors, translations, UX validation | Planned | 0 | 11 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-entities-persistence-and-observability-1.md](./feature-entities-persistence-and-observability-1.md) | Entities, coordinator wiring, restore, diagnostics, HA events, unload behavior | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Session/decay plan; config flow plan |

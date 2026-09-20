@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'Completed'
 tags: [feature, architecture, home-assistant, capability, strategy]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Capability And Strategy Plan
 
@@ -35,9 +35,9 @@ tags: [feature, architecture, home-assistant, capability, strategy]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Create `custom_components/occupancy_duration/capability.py` with `SensorCapabilities`, `CapabilityConfidence`, and `CapabilitySummary` dataclasses or enums covering all PRD-required fields. |  |  |
-| TASK-002 | Create or extend `custom_components/occupancy_duration/const.py` with a `StrategyMode` enum and constant keys used by config flow, diagnostics, and tests. |  |  |
-| TASK-003 | Define an internal source snapshot structure in `custom_components/occupancy_duration/capability.py` that carries entity state, attributes, registry metadata, and sibling-entity candidates in one immutable object. |  |  |
+| TASK-001 | Create `custom_components/occupancy_duration/capability.py` with `SensorCapabilities`, `CapabilityConfidence`, and `CapabilitySummary` dataclasses or enums covering all PRD-required fields. | ✅ | 2026-09-20 |
+| TASK-002 | Create or extend `custom_components/occupancy_duration/const.py` with a `StrategyMode` enum and constant keys used by config flow, diagnostics, and tests. | ✅ | 2026-09-20 |
+| TASK-003 | Define an internal source snapshot structure in `custom_components/occupancy_duration/capability.py` that carries entity state, attributes, registry metadata, and sibling-entity candidates in one immutable object. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Evidence Collection Pipeline
 
@@ -45,9 +45,9 @@ tags: [feature, architecture, home-assistant, capability, strategy]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Implement a state-and-attribute inspector in `custom_components/occupancy_duration/capability.py` that determines readable current-state, motion, occupancy, presence, and duration-exposure signals. |  |  |
-| TASK-005 | Implement registry-backed sibling discovery in `custom_components/occupancy_duration/capability.py` that only considers entities on the same device as related candidates. |  |  |
-| TASK-006 | Implement confidence resolution rules in `custom_components/occupancy_duration/capability.py` that mark findings as `confirmed`, `inferred`, or `unknown` and record rationale strings for diagnostics. |  |  |
+| TASK-004 | Implement a state-and-attribute inspector in `custom_components/occupancy_duration/capability.py` that determines readable current-state, motion, occupancy, presence, and duration-exposure signals. | ✅ | 2026-09-20 |
+| TASK-005 | Implement registry-backed sibling discovery in `custom_components/occupancy_duration/capability.py` that only considers entities on the same device as related candidates. | ✅ | 2026-09-20 |
+| TASK-006 | Implement confidence resolution rules in `custom_components/occupancy_duration/capability.py` that mark findings as `confirmed`, `inferred`, or `unknown` and record rationale strings for diagnostics. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Strategy Recommendation Engine
 
@@ -55,9 +55,9 @@ tags: [feature, architecture, home-assistant, capability, strategy]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Implement `recommend_strategy(...)` in `custom_components/occupancy_duration/capability.py` to map explicit occupancy to `NATIVE_OCCUPANCY`, continuous ON/OFF motion to `CONTINUOUS_MOTION`, event-only sources to `EVENT_ONLY`, and mixed occupancy plus motion sources to `HYBRID`. |  |  |
-| TASK-008 | Implement override-preservation helpers in `custom_components/occupancy_duration/capability.py` or `custom_components/occupancy_duration/const.py` so user-selected strategy wins over auto mode whenever an explicit override exists. |  |  |
-| TASK-009 | Expose a serialized recommendation payload from `custom_components/occupancy_duration/capability.py` for consumption by `custom_components/occupancy_duration/config_flow.py` and `custom_components/occupancy_duration/diagnostics.py`. |  |  |
+| TASK-007 | Implement `recommend_strategy(...)` in `custom_components/occupancy_duration/capability.py` to map explicit occupancy to `NATIVE_OCCUPANCY`, continuous ON/OFF motion to `CONTINUOUS_MOTION`, event-only sources to `EVENT_ONLY`, and mixed occupancy plus motion sources to `HYBRID`. | ✅ | 2026-09-20 |
+| TASK-008 | Implement override-preservation helpers in `custom_components/occupancy_duration/capability.py` or `custom_components/occupancy_duration/const.py` so user-selected strategy wins over auto mode whenever an explicit override exists. | ✅ | 2026-09-20 |
+| TASK-009 | Expose a serialized recommendation payload from `custom_components/occupancy_duration/capability.py` for consumption by `custom_components/occupancy_duration/config_flow.py` and `custom_components/occupancy_duration/diagnostics.py`. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Test Coverage And Integration Contracts
 
@@ -65,8 +65,8 @@ tags: [feature, architecture, home-assistant, capability, strategy]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-010 | Create `tests/test_capability.py` with fixtures and cases for continuous motion, event-only, explicit occupancy, explicit presence, unavailable sources, related occupancy siblings, and unknown semantics. |  |  |
-| TASK-011 | Add integration-facing contract tests in `tests/test_capability.py` that verify manual override preservation and the exported summary structure used by config flow and diagnostics. |  |  |
+| TASK-010 | Create `tests/test_capability.py` with fixtures and cases for continuous motion, event-only, explicit occupancy, explicit presence, unavailable sources, related occupancy siblings, and unknown semantics. | ✅ | 2026-09-20 |
+| TASK-011 | Add integration-facing contract tests in `tests/test_capability.py` that verify manual override preservation and the exported summary structure used by config flow and diagnostics. | ✅ | 2026-09-20 |
 
 ## Section 3 - Alternatives
 
