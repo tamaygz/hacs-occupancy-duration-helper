@@ -3,7 +3,7 @@ name: "execplan"
 description: "Coordinate execution of one implementation plan, plan section, or planning topic from docs/IMPPLANS with index-aware progress tracking, model-aware delegation, and small-scope iteration"
 argument-hint: "<plan file | plan section | topic> [optional focus or constraint]"
 agent: "agent"
-model: ["GPT-5 (copilot)"]
+model: ["GPT-5.4 (copilot)"]
 ---
 
 Execute the requested implementation slice from the planning system for this repository.
