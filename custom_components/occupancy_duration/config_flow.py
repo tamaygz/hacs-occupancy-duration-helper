@@ -144,7 +144,7 @@ def validate_stage_payload(
         raise ValueError("invalid_stage_range")
 
     for existing in existing_stages:
-        existing_min = existing.get(CONF_STAGE_MIN_DURATION, 0)
+        existing_min = existing[CONF_STAGE_MIN_DURATION]
         existing_max = existing.get(CONF_STAGE_MAX_DURATION)
         new_min = normalised[CONF_STAGE_MIN_DURATION]
         new_max = normalised[CONF_STAGE_MAX_DURATION]
