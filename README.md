@@ -298,13 +298,14 @@ python -m mypy custom_components tests
 
 ### Validation and release checklist
 
-Before publishing `v0.1.0`:
+Before publishing a release:
 
 1. Run the shared validation tasks locally or via CI.
-2. Ensure `custom_components/occupancy_duration/manifest.json` version matches the intended GitHub release version.
+2. Ensure `custom_components/occupancy_duration/manifest.json` and `pyproject.toml` match the intended GitHub release version.
 3. Replace the placeholder brand assets in `custom_components/occupancy_duration/brand/` with real artwork.
 4. Confirm README, diagnostics, config flow, unload, and restore behavior still match the current implementation.
 5. Publish a full GitHub Release, not only a tag.
+6. Use `.github/workflows/release.yml` so version bumps, the release commit, the tag, and the GitHub Release stay in sync.
 
 ---
 

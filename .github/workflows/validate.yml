@@ -27,6 +27,12 @@ jobs:
         with:
           python-version: '3.14'
 
+      - name: Install development dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+
       - name: Validate pyproject and JSON files
         shell: bash
         run: |
@@ -36,7 +42,7 @@ jobs:
           import tomllib
 
           root = pathlib.Path('.')
-          tomllib.loads((root / 'pyproject.toml').read_text(encoding='utf-8'))
+          pyproject = tomllib.loads((root / 'pyproject.toml').read_text(encoding='utf-8'))
 
           json_files = [
               root / 'hacs.json',
@@ -44,8 +50,16 @@ jobs:
               root / 'custom_components' / 'occupancy_duration' / 'strings.json',
               root / 'custom_components' / 'occupancy_duration' / 'translations' / 'en.json',
           ]
+          parsed_json = {}
           for path in json_files:
-              json.loads(path.read_text(encoding='utf-8'))
+            parsed_json[path.name] = json.loads(path.read_text(encoding='utf-8'))
+
+          manifest_version = str(parsed_json['manifest.json']['version'])
+          pyproject_version = str(pyproject['project']['version'])
+          if manifest_version != pyproject_version:
+            raise SystemExit(
+              f'version mismatch: manifest.json={manifest_version} pyproject.toml={pyproject_version}'
+            )
           print('metadata OK')
           PY
 
@@ -54,6 +68,11 @@ jobs:
         run: |
           python -m py_compile custom_components/occupancy_duration/*.py
           python -m py_compile tests/*.py
+
+      - name: Run pytest
+        shell: bash
+        run: |
+          pytest
 
   hacs:
     name: HACS validation

@@ -103,7 +103,7 @@ tags: [process, ci, tests, release, validation]
 - **FILE-008**: `tests/test_sensor.py` - created - Verify entities and attributes.
 - **FILE-009**: `tests/test_restore.py` - created - Verify restore and diagnostics behavior.
 - **FILE-010**: `.github/workflows/validate.yml` - created - Run quality and metadata checks.
-- **FILE-011**: `.github/workflows/release.yml` - created or omitted with documented manual alternative - Define release execution.
+- **FILE-011**: `.github/workflows/release.yml` - created - Bump synchronized versions, commit, tag, and publish GitHub Releases.
 - **FILE-012**: `.github/ISSUE_TEMPLATE/bug_report.yml` - created - Structure bug reports.
 - **FILE-013**: `.github/ISSUE_TEMPLATE/feature_request.yml` - created - Structure feature requests.
 
