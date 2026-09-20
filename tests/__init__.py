@@ -1,0 +1,1 @@
+"""Tests for the Occupancy Duration Helper integration."""

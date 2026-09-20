@@ -24,9 +24,7 @@ It is derived from both source documents in `docs/PRD/` and cross-checked agains
 - Workspace execution prompt present:
   - `.github/prompts/execplan.prompt.md`
 - Current implementation assets missing:
-  - `tests/`
-  - `pyproject.toml`
-  - `LICENSE`
+  - `custom_components/occupancy_duration/brand/`
 
 ## Plan Tracking
 
@@ -36,7 +34,7 @@ It is derived from both source documents in `docs/PRD/` and cross-checked agains
 | [feature-session-and-decay-engine-1.md](./feature-session-and-decay-engine-1.md) | Session lifecycle, scoring, decay, duration stages, scheduler contracts | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-config-and-options-flow-1.md](./feature-config-and-options-flow-1.md) | Config flow, reconfigure/options split, selectors, translations, UX validation | Planned | 0 | 11 | Initial plan created from PRD and current HA docs | Capability and strategy plan |
 | [feature-entities-persistence-and-observability-1.md](./feature-entities-persistence-and-observability-1.md) | Entities, coordinator wiring, restore, diagnostics, HA events, unload behavior | Planned | 0 | 12 | Initial plan created from PRD and current HA docs | Session/decay plan; config flow plan |
-| [infrastructure-repository-hacs-and-branding-1.md](./infrastructure-repository-hacs-and-branding-1.md) | Repository scaffold, manifest, HACS metadata, README, pyproject, brand assets | In progress | 5 | 11 | Created `custom_components/occupancy_duration/`, initial `manifest.json`, and root `hacs.json`; local scaffold metadata now discoverable | None |
+| [infrastructure-repository-hacs-and-branding-1.md](./infrastructure-repository-hacs-and-branding-1.md) | Repository scaffold, manifest, HACS metadata, README, pyproject, brand assets | In progress | 8 | 8 | Added `pyproject.toml`, `LICENSE`, and reserved `tests/`; aligned minimum Home Assistant compatibility to `2026.3.0` for local branding and Python 3.14 | None |
 | [process-quality-validation-and-release-1.md](./process-quality-validation-and-release-1.md) | Tests, CI, issue templates, validation gates, release workflow, HACS readiness | Planned | 0 | 13 | Initial plan created from PRD and current HA/HACS docs | All other plans |
 
 ## Execution Order

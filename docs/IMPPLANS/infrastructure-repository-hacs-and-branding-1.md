@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'In progress'
 tags: [infrastructure, hacs, repository, branding, documentation]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: In progress](https://img.shields.io/badge/status-In%20progress-yellow)
 
 # Repository, HACS, And Branding Plan
 
@@ -26,6 +26,7 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 - **CON-001**: The implementation is greenfield; the repository currently lacks `custom_components/`, `hacs.json`, `pyproject.toml`, `LICENSE`, and all branding assets.
 - **CON-002**: The PRD forbids obsolete branding flow through `home-assistant/brands/custom_integrations`; only local `brand/` assets are valid for this project.
 - **GUD-001**: Keep `manifest.json` free of unnecessary Python requirements or inter-integration dependencies until real code proves they are needed.
+- **GUD-002**: The repository compatibility floor is aligned to Home Assistant `2026.3.0` and Python `3.14`, because local custom-integration brand assets and the active development toolchain depend on that baseline.
 
 ## Section 2 - Implementation Steps
 
@@ -45,9 +46,9 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Create `pyproject.toml` with project metadata, Python version constraints, and development dependency groups for Home Assistant, pytest, `pytest-homeassistant-custom-component`, Ruff, and optional static analysis. |  |  |
-| TASK-005 | Create `LICENSE` at the repository root using the license choice approved for the project owner. |  |  |
-| TASK-006 | Reserve `tests/` ownership in `pyproject.toml` and repository documentation so later plans can attach the full test suite cleanly. |  |  |
+| TASK-004 | Create `pyproject.toml` with project metadata, Python version constraints, and development dependency groups for Home Assistant, pytest, `pytest-homeassistant-custom-component`, Ruff, and optional static analysis. | ✅ | 2026-09-20 |
+| TASK-005 | Create `LICENSE` at the repository root using the license choice approved for the project owner. | ✅ | 2026-09-20 |
+| TASK-006 | Reserve `tests/` ownership in `pyproject.toml` and repository documentation so later plans can attach the full test suite cleanly. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Documentation Contract
 
