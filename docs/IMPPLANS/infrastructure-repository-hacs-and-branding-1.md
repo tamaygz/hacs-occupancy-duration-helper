@@ -35,9 +35,9 @@ tags: [infrastructure, hacs, repository, branding, documentation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Create `custom_components/occupancy_duration/` with placeholder module ownership reserved for `__init__.py`, `manifest.json`, `config_flow.py`, `const.py`, `capability.py`, `session.py`, `decay.py`, `stage.py`, `storage.py`, `coordinator.py`, `sensor.py`, `binary_sensor.py`, `diagnostics.py`, `strings.json`, and `translations/en.json`. |  |  |
-| TASK-002 | Create `custom_components/occupancy_duration/manifest.json` with `domain`, `name`, `codeowners`, `config_flow`, `documentation`, `issue_tracker`, `iot_class`, `integration_type`, and `version`. |  |  |
-| TASK-003 | Create root-level `hacs.json` with the integration name and minimum Home Assistant version only, unless later HACS validation demands additional fields. |  |  |
+| TASK-001 | Create `custom_components/occupancy_duration/` with placeholder module ownership reserved for `__init__.py`, `manifest.json`, `config_flow.py`, `const.py`, `capability.py`, `session.py`, `decay.py`, `stage.py`, `storage.py`, `coordinator.py`, `sensor.py`, `binary_sensor.py`, `diagnostics.py`, `strings.json`, and `translations/en.json`. | ✅ | 2026-09-20 |
+| TASK-002 | Create `custom_components/occupancy_duration/manifest.json` with `domain`, `name`, `codeowners`, `config_flow`, `documentation`, `issue_tracker`, `iot_class`, `integration_type`, and `version`. | ✅ | 2026-09-20 |
+| TASK-003 | Create root-level `hacs.json` with the integration name and minimum Home Assistant version only, unless later HACS validation demands additional fields. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Development Scaffold
 
