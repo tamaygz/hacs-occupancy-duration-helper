@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement for Occupancy Duration Helper
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What is difficult or impossible with the current behavior?
+    validations:
+      required: true
+  - type: textarea
+    id: desired_behavior
+    attributes:
+      label: Desired behavior
+      description: Describe the behavior you want.
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Example automation or use case
+      description: Show how you would use the feature in practice.
+    validations:
+      required: true
+  - type: textarea
+    id: current_limit
+    attributes:
+      label: Why current behavior is insufficient
+    validations:
+      required: true

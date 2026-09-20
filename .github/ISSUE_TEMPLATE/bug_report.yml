@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a problem with Occupancy Duration Helper
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.3.0"
+    validations:
+      required: true
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: source_entity
+    attributes:
+      label: Source entity
+      placeholder: "binary_sensor.bathroom_motion"
+    validations:
+      required: true
+  - type: input
+    id: source_device
+    attributes:
+      label: Source integration or device
+      placeholder: "Aqara FP2 / mmWave sensor / ESPHome occupancy"
+    validations:
+      required: true
+  - type: textarea
+    id: detected_capabilities
+    attributes:
+      label: Detected capabilities
+      description: Paste the capability summary shown during setup or from diagnostics.
+    validations:
+      required: true
+  - type: input
+    id: selected_strategy
+    attributes:
+      label: Selected strategy
+      placeholder: "automatic / native_occupancy / continuous_motion / event_only / hybrid"
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Attach or paste relevant diagnostics export content. Do not include secrets.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste only the relevant log lines for this issue.
+    validations:
+      required: false

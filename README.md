@@ -296,6 +296,16 @@ python -m ruff format .
 python -m mypy custom_components tests
 ```
 
+### Validation and release checklist
+
+Before publishing `v0.1.0`:
+
+1. Run the shared validation tasks locally or via CI.
+2. Ensure `custom_components/occupancy_duration/manifest.json` version matches the intended GitHub release version.
+3. Replace the placeholder brand assets in `custom_components/occupancy_duration/brand/` with real artwork.
+4. Confirm README, diagnostics, config flow, unload, and restore behavior still match the current implementation.
+5. Publish a full GitHub Release, not only a tag.
+
 ---
 
 ## Contributing

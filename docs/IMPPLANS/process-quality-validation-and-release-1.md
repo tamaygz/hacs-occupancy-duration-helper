@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'Completed'
 tags: [process, ci, tests, release, validation]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Quality, Validation, And Release Plan
 
@@ -33,9 +33,9 @@ tags: [process, ci, tests, release, validation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Create `tests/__init__.py` and `tests/conftest.py` with Home Assistant custom-component fixtures, mock config entries, and source-entity helpers used across all test modules. |  |  |
-| TASK-002 | Create the PRD-required test files `tests/test_capability.py`, `tests/test_session.py`, `tests/test_decay.py`, `tests/test_stage.py`, `tests/test_config_flow.py`, `tests/test_sensor.py`, and `tests/test_restore.py`. |  |  |
-| TASK-003 | Document how test modules map to the implementation plans so follow-on agents keep coverage aligned with the design. |  |  |
+| TASK-001 | Create `tests/__init__.py` and `tests/conftest.py` with Home Assistant custom-component fixtures, mock config entries, and source-entity helpers used across all test modules. | ✅ | 2026-09-20 |
+| TASK-002 | Create the PRD-required test files `tests/test_capability.py`, `tests/test_session.py`, `tests/test_decay.py`, `tests/test_stage.py`, `tests/test_config_flow.py`, `tests/test_sensor.py`, and `tests/test_restore.py`. | ✅ | 2026-09-20 |
+| TASK-003 | Document how test modules map to the implementation plans so follow-on agents keep coverage aligned with the design. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Validation Workflow
 
@@ -43,9 +43,9 @@ tags: [process, ci, tests, release, validation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Create `.github/workflows/validate.yml` with jobs for Python syntax or lint checks, JSON validation, manifest validation, translation consistency, pytest execution, and HACS repository validation. |  |  |
-| TASK-005 | Integrate current Home Assistant validation tooling such as Hassfest where appropriate for a custom integration repository. |  |  |
-| TASK-006 | Integrate current HACS validation tooling or action support so repository structure and metadata are checked on push and pull request. |  |  |
+| TASK-004 | Create `.github/workflows/validate.yml` with jobs for Python syntax or lint checks, JSON validation, manifest validation, translation consistency, pytest execution, and HACS repository validation. | ✅ | 2026-09-20 |
+| TASK-005 | Integrate current Home Assistant validation tooling such as Hassfest where appropriate for a custom integration repository. | ✅ | 2026-09-20 |
+| TASK-006 | Integrate current HACS validation tooling or action support so repository structure and metadata are checked on push and pull request. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Issue Intake And Project Hygiene
 
@@ -53,8 +53,8 @@ tags: [process, ci, tests, release, validation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Create `.github/ISSUE_TEMPLATE/bug_report.yml` requesting Home Assistant version, integration version, source entity, source device or integration, detected capabilities, selected strategy, expected behavior, actual behavior, diagnostics, and relevant logs. |  |  |
-| TASK-008 | Create `.github/ISSUE_TEMPLATE/feature_request.yml` requesting problem statement, desired behavior, automation or use-case example, and why current behavior is insufficient. |  |  |
+| TASK-007 | Create `.github/ISSUE_TEMPLATE/bug_report.yml` requesting Home Assistant version, integration version, source entity, source device or integration, detected capabilities, selected strategy, expected behavior, actual behavior, diagnostics, and relevant logs. | ✅ | 2026-09-20 |
+| TASK-008 | Create `.github/ISSUE_TEMPLATE/feature_request.yml` requesting problem statement, desired behavior, automation or use-case example, and why current behavior is insufficient. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Release Contract
 
@@ -62,9 +62,9 @@ tags: [process, ci, tests, release, validation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-009 | Define and document the release checklist that blocks `v0.1.0` until manifest version, tests, HACS validation, README, brand assets, and GitHub Issues state all pass. |  |  |
-| TASK-010 | Create `.github/workflows/release.yml` if automation is chosen, or document a manual release process with explicit version-bump and verification steps if not. |  |  |
-| TASK-011 | Add a manifest-version sync check in workflow logic or release documentation so `custom_components/occupancy_duration/manifest.json` always matches the GitHub release version. |  |  |
+| TASK-009 | Define and document the release checklist that blocks `v0.1.0` until manifest version, tests, HACS validation, README, brand assets, and GitHub Issues state all pass. | ✅ | 2026-09-20 |
+| TASK-010 | Create `.github/workflows/release.yml` if automation is chosen, or document a manual release process with explicit version-bump and verification steps if not. | ✅ | 2026-09-20 |
+| TASK-011 | Add a manifest-version sync check in workflow logic or release documentation so `custom_components/occupancy_duration/manifest.json` always matches the GitHub release version. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 5 - Final HACS Readiness Gate
 
@@ -72,8 +72,8 @@ tags: [process, ci, tests, release, validation]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-012 | Convert the PRD HACS validation checklist into a tracked checklist in repository documentation or workflow output so agents can verify readiness item by item. |  |  |
-| TASK-013 | Validate that the repository passes the public-repo, release, metadata, README, branding, config-flow, unload, and restore expectations before any HACS default-repository submission is considered. |  |  |
+| TASK-012 | Convert the PRD HACS validation checklist into a tracked checklist in repository documentation or workflow output so agents can verify readiness item by item. | ✅ | 2026-09-20 |
+| TASK-013 | Validate that the repository passes the public-repo, release, metadata, README, branding, config-flow, unload, and restore expectations before any HACS default-repository submission is considered. | ✅ | 2026-09-20 |
 
 ## Section 3 - Alternatives
 
