@@ -47,6 +47,8 @@ ATTR_LAST_ACTIVITY_AT = "last_activity_at"
 ATTR_STAGE = "stage"
 ATTR_SESSION_STATE = "session_state"
 ATTR_SCORE = "score"
+ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_IDLE_DURATION = "idle_duration"
 
 # Score bounds
 SCORE_MAX = 100.0

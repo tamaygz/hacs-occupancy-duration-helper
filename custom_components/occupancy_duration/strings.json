@@ -17,9 +17,12 @@
       },
       "strategy": {
         "title": "Strategy",
-        "description": "Choose how the selected source should be interpreted.",
+        "description": "Automatic is recommended — it re-detects the best mode whenever capabilities change. Choosing a manual mode locks behaviour and overrides future capability re-detection.",
         "data": {
           "strategy": "Strategy"
+        },
+        "data_description": {
+          "strategy": "Automatic: detects native occupancy, continuous motion, event-only, or hybrid automatically. Manual modes: lock a specific interpretation regardless of sensor capability changes."
         }
       },
       "decay": {
@@ -87,6 +90,7 @@
           "clear_all_stages": "Clear all stages"
         },
         "data_description": {
+          "strategy": "Automatic re-selects from current sensor capabilities on every reload. Manual modes lock the interpretation.",
           "default_half_life": "How fast activity fades when the source is inactive. 30 s = fast, 60 s = normal, 180 s = slow.",
           "end_threshold": "Score (0–100) below which the session enters the ending state. Lower values keep sessions alive longer after the last event.",
           "end_grace": "Seconds the session stays in the ending state before closing completely.",
