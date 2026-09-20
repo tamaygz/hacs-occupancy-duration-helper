@@ -7,7 +7,9 @@ from enum import StrEnum
 DOMAIN = "occupancy_duration"
 
 # Config/options keys
+CONF_NAME = "name"
 CONF_SOURCE_ENTITY = "source_entity"
+CONF_SOURCE_REVISION = "source_revision"
 CONF_STRATEGY = "strategy"
 CONF_DEFAULT_HALF_LIFE = "default_half_life"
 CONF_END_THRESHOLD = "end_threshold"
@@ -27,6 +29,8 @@ DEFAULT_HALF_LIFE = 60  # seconds
 DEFAULT_END_THRESHOLD = 5  # score percentage
 DEFAULT_END_GRACE = 15  # seconds
 DEFAULT_RESTORE_SESSION = True
+DEFAULT_NAME = "Occupancy Duration"
+DEFAULT_SOURCE_REVISION = 1
 
 # Score bounds
 SCORE_MAX = 100.0

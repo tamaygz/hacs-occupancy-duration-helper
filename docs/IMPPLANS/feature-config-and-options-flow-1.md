@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'Completed'
 tags: [feature, ui, config-flow, translations, home-assistant]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Config And Options Flow Plan
 
@@ -33,9 +33,9 @@ tags: [feature, ui, config-flow, translations, home-assistant]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Extend `custom_components/occupancy_duration/const.py` with config keys for source entity, strategy mode, default half-life, end-threshold, end-grace, restore policy, and stages. |  |  |
-| TASK-002 | Define a storage split in `custom_components/occupancy_duration/config_flow.py` where required setup identity fields live in config-entry data and runtime-tuning fields live in options. |  |  |
-| TASK-003 | Define stage-schema validation helpers in `custom_components/occupancy_duration/config_flow.py` or a closely related helper module so stage ordering and range correctness are enforced centrally. |  |  |
+| TASK-001 | Extend `custom_components/occupancy_duration/const.py` with config keys for source entity, strategy mode, default half-life, end-threshold, end-grace, restore policy, and stages. | ✅ | 2026-09-20 |
+| TASK-002 | Define a storage split in `custom_components/occupancy_duration/config_flow.py` where required setup identity fields live in config-entry data and runtime-tuning fields live in options. | ✅ | 2026-09-20 |
+| TASK-003 | Define stage-schema validation helpers in `custom_components/occupancy_duration/config_flow.py` or a closely related helper module so stage ordering and range correctness are enforced centrally. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Initial Config Flow
 
@@ -43,9 +43,9 @@ tags: [feature, ui, config-flow, translations, home-assistant]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Implement the `user` and follow-on steps in `custom_components/occupancy_duration/config_flow.py` for name and source-entity selection using Home Assistant selectors. |  |  |
-| TASK-005 | Implement a capability-preview step in `custom_components/occupancy_duration/config_flow.py` that reads the exported summary from `custom_components/occupancy_duration/capability.py` and shows the recommended strategy. |  |  |
-| TASK-006 | Implement strategy, decay, threshold, grace, restore, and optional stage-configuration steps in `custom_components/occupancy_duration/config_flow.py`, including sensible defaults and a custom half-life path. |  |  |
+| TASK-004 | Implement the `user` and follow-on steps in `custom_components/occupancy_duration/config_flow.py` for name and source-entity selection using Home Assistant selectors. | ✅ | 2026-09-20 |
+| TASK-005 | Implement a capability-preview step in `custom_components/occupancy_duration/config_flow.py` that reads the exported summary from `custom_components/occupancy_duration/capability.py` and shows the recommended strategy. | ✅ | 2026-09-20 |
+| TASK-006 | Implement strategy, decay, threshold, grace, restore, and optional stage-configuration steps in `custom_components/occupancy_duration/config_flow.py`, including sensible defaults and a custom half-life path. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Reconfigure And Options Editing
 
@@ -53,9 +53,9 @@ tags: [feature, ui, config-flow, translations, home-assistant]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Implement `async_step_reconfigure` in `custom_components/occupancy_duration/config_flow.py` for setup-identity changes such as helper name and source entity, using `async_update_reload_and_abort` on success. |  |  |
-| TASK-008 | Implement `OptionsFlow` in `custom_components/occupancy_duration/config_flow.py` or a dedicated options helper for runtime tuning fields such as strategy override, decay values, restore policy, and stages. |  |  |
-| TASK-009 | Implement source-change handling in the flow layer so existing session state is explicitly invalidated and never silently migrated across different source semantics. |  |  |
+| TASK-007 | Implement `async_step_reconfigure` in `custom_components/occupancy_duration/config_flow.py` for setup-identity changes such as helper name and source entity, using `async_update_reload_and_abort` on success. | ✅ | 2026-09-20 |
+| TASK-008 | Implement `OptionsFlow` in `custom_components/occupancy_duration/config_flow.py` or a dedicated options helper for runtime tuning fields such as strategy override, decay values, restore policy, and stages. | ✅ | 2026-09-20 |
+| TASK-009 | Implement source-change handling in the flow layer so existing session state is explicitly invalidated and never silently migrated across different source semantics. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Translations And Tests
 
@@ -63,8 +63,8 @@ tags: [feature, ui, config-flow, translations, home-assistant]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-010 | Create `custom_components/occupancy_duration/strings.json` and `custom_components/occupancy_duration/translations/en.json` covering config steps, reconfigure, options, errors, aborts, and capability-summary labels. |  |  |
-| TASK-011 | Create `tests/test_config_flow.py` with cases for happy-path setup, validation errors, source-change handling, manual strategy override persistence, and reconfigure-versus-options behavior. |  |  |
+| TASK-010 | Create `custom_components/occupancy_duration/strings.json` and `custom_components/occupancy_duration/translations/en.json` covering config steps, reconfigure, options, errors, aborts, and capability-summary labels. | ✅ | 2026-09-20 |
+| TASK-011 | Create `tests/test_config_flow.py` with cases for happy-path setup, validation errors, source-change handling, manual strategy override persistence, and reconfigure-versus-options behavior. | ✅ | 2026-09-20 |
 
 ## Section 3 - Alternatives
 

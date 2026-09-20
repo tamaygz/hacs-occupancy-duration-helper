@@ -1,0 +1,111 @@
+{
+  "title": "Occupancy Duration Helper",
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Create helper",
+        "description": "Choose a name and source entity.",
+        "data": {
+          "name": "Name",
+          "source_entity": "Source entity"
+        }
+      },
+      "capability_preview": {
+        "title": "Capability preview",
+        "description": "Detected capabilities:\n{summary}\n\nRecommended strategy: {strategy}"
+      },
+      "strategy": {
+        "title": "Strategy",
+        "description": "Choose how the selected source should be interpreted.",
+        "data": {
+          "strategy": "Strategy"
+        }
+      },
+      "decay": {
+        "title": "Decay settings",
+        "description": "Configure default decay, threshold, grace period, restore behavior, and whether to add stages.",
+        "data": {
+          "default_half_life": "Default half-life (seconds)",
+          "end_threshold": "End threshold",
+          "end_grace": "End grace (seconds)",
+          "restore_session": "Restore session after restart",
+          "add_stages": "Add duration stages"
+        }
+      },
+      "stage": {
+        "title": "Add duration stage",
+        "description": "Define one stage. You can add another stage afterward.",
+        "data": {
+          "id": "Stage ID",
+          "name": "Stage name",
+          "min_duration": "Minimum duration (seconds)",
+          "max_duration": "Maximum duration (seconds)",
+          "half_life": "Stage half-life (seconds)",
+          "add_another": "Add another stage"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure helper",
+        "description": "Change the helper name or source entity.",
+        "data": {
+          "name": "Name",
+          "source_entity": "Source entity"
+        }
+      }
+    },
+    "error": {
+      "source_already_configured": "This source entity is already configured.",
+      "invalid_stage_range": "The stage range is invalid.",
+      "stage_overlap": "Stages must not overlap.",
+      "cannot_inspect_source": "The selected source could not be inspected."
+    },
+    "abort": {
+      "already_configured": "Already configured",
+      "reconfigure_successful": "Reconfiguration successful"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "description": "Adjust runtime behavior for this helper.",
+        "data": {
+          "strategy": "Strategy",
+          "default_half_life": "Default half-life (seconds)",
+          "end_threshold": "End threshold",
+          "end_grace": "End grace (seconds)",
+          "restore_session": "Restore session after restart",
+          "add_stages": "Add duration stages"
+        }
+      },
+      "stage": {
+        "title": "Add duration stage",
+        "description": "Define one stage. You can add another stage afterward.",
+        "data": {
+          "id": "Stage ID",
+          "name": "Stage name",
+          "min_duration": "Minimum duration (seconds)",
+          "max_duration": "Maximum duration (seconds)",
+          "half_life": "Stage half-life (seconds)",
+          "add_another": "Add another stage"
+        }
+      }
+    },
+    "error": {
+      "invalid_stage_range": "The stage range is invalid.",
+      "stage_overlap": "Stages must not overlap."
+    }
+  },
+  "selector": {
+    "strategy": {
+      "options": {
+        "auto": "Automatic",
+        "native_occupancy": "Native occupancy",
+        "continuous_motion": "Continuous motion",
+        "event_only": "Event-only motion",
+        "hybrid": "Hybrid occupancy + motion"
+      }
+    }
+  }
+}
