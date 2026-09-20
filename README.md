@@ -6,6 +6,8 @@
 
 Occupancy Duration Helper is a Home Assistant custom integration that turns motion and presence signals into persistent occupancy sessions with duration tracking, configurable stages, and adaptive decay.
 
+It grew out of practical bathroom automations in my own home: I wanted to play music on the toilet, but only when actually pooping, so a fade-in starts only when a longer visit reaches the configured long stage. I also wanted music and ventilation while showering, but not when someone only enters briefly to wash their hands. This integration makes those use cases easy by listening to a motion sensor and tracking the session over time according to the configured stage profile.
+
 ## Quick Start
 
 [![Open your Home Assistant instance and add this repository in HACS][hacs-repository-badge]][hacs-repository-url]
