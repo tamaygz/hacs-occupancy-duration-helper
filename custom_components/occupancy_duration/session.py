@@ -32,6 +32,8 @@ class OccupancySession:
     last_active_signal_at: datetime | None
     ended_at: datetime | None
     score: float
+    decay_anchor_at: datetime | None
+    decay_anchor_score: float | None
     stage: str | None
     state: SessionState
 
@@ -103,6 +105,8 @@ def start_session(
         last_active_signal_at=current_time,
         ended_at=None,
         score=score,
+        decay_anchor_at=None,
+        decay_anchor_score=None,
         stage=stage_id,
         state=SessionState.ACTIVE,
     )
@@ -129,6 +133,8 @@ def activity_detected(
         last_activity_at=now,
         last_active_signal_at=now,
         score=reinforce_score(session.score, authoritative=authoritative),
+        decay_anchor_at=None,
+        decay_anchor_score=None,
         stage=_resolve_stage_id(session, now, stages),
         state=SessionState.ACTIVE,
         ended_at=None,
@@ -140,7 +146,10 @@ def activity_detected(
     )
 
 
-def source_became_inactive(session: OccupancySession) -> SessionTransition:
+def source_became_inactive(
+    session: OccupancySession,
+    now: datetime | None = None,
+) -> SessionTransition:
     """Move an open session into DECAYING when source activity stops."""
     if session.state in {SessionState.CLOSED, SessionState.IDLE}:
         return SessionTransition(
@@ -150,7 +159,12 @@ def source_became_inactive(session: OccupancySession) -> SessionTransition:
             changed=False,
         )
 
-    updated = replace(session, state=SessionState.DECAYING)
+    updated = replace(
+        session,
+        state=SessionState.DECAYING,
+        decay_anchor_at=now or _utc_now(),
+        decay_anchor_score=session.score,
+    )
     return SessionTransition(
         session=updated,
         previous_state=session.state,
@@ -163,9 +177,59 @@ def decay_tick(
     evaluation: SessionEvaluationInput,
 ) -> SessionTransition:
     """Evaluate one decay tick for an existing session."""
+    if evaluation.source_currently_active:
+        if session.state == SessionState.ACTIVE:
+            updated = replace(
+                session,
+                stage=_resolve_stage_id(session, evaluation.now, evaluation.stages),
+                decay_anchor_at=None,
+                decay_anchor_score=None,
+            )
+            return SessionTransition(
+                session=updated,
+                previous_state=session.state,
+                reason="source still active; session heartbeat",
+                changed=updated != session,
+                decay_result=DecayResult(
+                    score=updated.score,
+                    decayed=False,
+                    reinforced=False,
+                    applied_half_life=evaluation.default_half_life,
+                    reason="source still active",
+                ),
+            )
+
+        updated = replace(
+            session,
+            last_activity_at=evaluation.now,
+            last_active_signal_at=evaluation.now,
+            score=reinforce_score(session.score, authoritative=evaluation.authoritative_active),
+            decay_anchor_at=None,
+            decay_anchor_score=None,
+            stage=_resolve_stage_id(session, evaluation.now, evaluation.stages),
+            state=SessionState.ACTIVE,
+            ended_at=None,
+        )
+        return SessionTransition(
+            session=updated,
+            previous_state=session.state,
+            reason="source active during decay tick; session reinforced",
+            decay_result=DecayResult(
+                score=updated.score,
+                decayed=False,
+                reinforced=True,
+                applied_half_life=evaluation.default_half_life,
+                reason="source still active",
+            ),
+        )
+
+    decay_anchor_at = session.decay_anchor_at or session.last_active_signal_at or session.last_activity_at
+    decay_anchor_score = (
+        session.decay_anchor_score if session.decay_anchor_score is not None else session.score
+    )
     decay_result = evaluate_decay(
-        session.score,
-        evaluation.elapsed_since_last_activity,
+        decay_anchor_score,
+        max(0.0, (evaluation.now - decay_anchor_at).total_seconds()),
         source_currently_active=evaluation.source_currently_active,
         authoritative_active=evaluation.authoritative_active,
         default_half_life=evaluation.default_half_life,
@@ -176,21 +240,6 @@ def decay_tick(
         ),
     )
 
-    if decay_result.reinforced:
-        updated = replace(
-            session,
-            score=decay_result.score,
-            last_active_signal_at=evaluation.now,
-            stage=_resolve_stage_id(session, evaluation.now, evaluation.stages),
-            state=SessionState.ACTIVE,
-        )
-        return SessionTransition(
-            session=updated,
-            previous_state=session.state,
-            reason="source active during decay tick; session reinforced",
-            decay_result=decay_result,
-        )
-
     next_state = (
         SessionState.ENDING
         if decay_result.score <= evaluation.end_threshold
@@ -199,6 +248,8 @@ def decay_tick(
     updated = replace(
         session,
         score=decay_result.score,
+        decay_anchor_at=decay_anchor_at,
+        decay_anchor_score=decay_anchor_score,
         stage=_resolve_stage_id(session, evaluation.now, evaluation.stages),
         state=next_state,
     )

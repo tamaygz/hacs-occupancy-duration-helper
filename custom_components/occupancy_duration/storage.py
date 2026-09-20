@@ -26,6 +26,8 @@ def serialize_session(session: OccupancySession | None) -> dict[str, Any] | None
         "last_active_signal_at": session.last_active_signal_at.isoformat() if session.last_active_signal_at else None,
         "ended_at": session.ended_at.isoformat() if session.ended_at else None,
         "score": session.score,
+        "decay_anchor_at": session.decay_anchor_at.isoformat() if session.decay_anchor_at else None,
+        "decay_anchor_score": session.decay_anchor_score,
         "stage": session.stage,
         "state": session.state.value,
     }
@@ -51,6 +53,16 @@ def deserialize_session(payload: dict[str, Any] | None) -> OccupancySession | No
                 else None
             ),
             score=float(payload["score"]),
+            decay_anchor_at=(
+                datetime.fromisoformat(payload["decay_anchor_at"])
+                if payload.get("decay_anchor_at")
+                else None
+            ),
+            decay_anchor_score=(
+                float(payload["decay_anchor_score"])
+                if payload.get("decay_anchor_score") is not None
+                else None
+            ),
             stage=payload.get("stage"),
             state=SessionState(payload["state"]),
         )

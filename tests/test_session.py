@@ -40,8 +40,10 @@ def test_reinforcement_does_not_reset_started_at() -> None:
 
 def test_source_inactive_moves_session_to_decaying() -> None:
     session = start_session(_now()).session
-    transition = source_became_inactive(session)
+    transition = source_became_inactive(session, _now() + timedelta(seconds=30))
     assert transition.session.state == SessionState.DECAYING
+    assert transition.session.decay_anchor_at == _now() + timedelta(seconds=30)
+    assert transition.session.decay_anchor_score == session.score
 
 
 def test_activity_during_decay_returns_to_active() -> None:
@@ -132,3 +134,59 @@ def test_stage_progresses_without_regressing_during_reinforcement() -> None:
 
     reinforced = activity_detected(long_session, started + timedelta(seconds=245), stages=stages).session
     assert reinforced.stage == "long"
+
+
+def test_repeated_decay_ticks_use_a_stable_decay_anchor() -> None:
+    started = _now()
+    session = start_session(started).session
+    decaying = source_became_inactive(session, started + timedelta(seconds=10)).session
+
+    after_first_tick = decay_tick(
+        decaying,
+        SessionEvaluationInput(
+            now=started + timedelta(seconds=70),
+            source_currently_active=False,
+            authoritative_active=False,
+            elapsed_since_last_activity=70.0,
+            default_half_life=60.0,
+        ),
+    ).session
+    after_second_tick = decay_tick(
+        after_first_tick,
+        SessionEvaluationInput(
+            now=started + timedelta(seconds=130),
+            source_currently_active=False,
+            authoritative_active=False,
+            elapsed_since_last_activity=130.0,
+            default_half_life=60.0,
+        ),
+    ).session
+
+    assert after_first_tick.score == 50.0
+    assert after_second_tick.score == 25.0
+
+
+def test_active_decay_tick_updates_stage_without_resetting_last_activity() -> None:
+    started = _now()
+    stages = (
+        DurationStage("short", "Short", 0, 60, 30),
+        DurationStage("medium", "Medium", 60, 180, 60),
+    )
+    session = start_session(started).session
+
+    transition = decay_tick(
+        session,
+        SessionEvaluationInput(
+            now=started + timedelta(seconds=90),
+            source_currently_active=True,
+            authoritative_active=False,
+            elapsed_since_last_activity=0.0,
+            default_half_life=60.0,
+            stages=stages,
+        ),
+    )
+
+    assert transition.session.state == SessionState.ACTIVE
+    assert transition.session.last_activity_at == started
+    assert transition.session.stage == "medium"
+    assert transition.session.score == session.score

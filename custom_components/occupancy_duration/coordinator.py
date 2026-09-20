@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
-from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .capability import CapabilitySummary, async_inspect_entity
@@ -47,6 +47,7 @@ from .storage import SessionStore
 
 
 ACTIVE_STATE_VALUES = {STATE_ON, STATE_HOME, "occupied", "detected", "present"}
+SESSION_TICK_INTERVAL = timedelta(seconds=1)
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -85,6 +86,8 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         )
         self._config_entry_ref: ConfigEntry = entry
         self._unsub_state: CALLBACK_TYPE | None = None
+        self._unsub_tick: CALLBACK_TYPE | None = None
+        self._tick_in_progress = False
         self._store = SessionStore(hass)
 
     @property
@@ -161,6 +164,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
             )
         )
         await self._store.async_save_session(self._config_entry_ref.entry_id, session)
+        self._refresh_periodic_tick(session)
 
         self._unsub_state = async_track_state_change_event(
             self.hass,
@@ -173,6 +177,9 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         if self._unsub_state is not None:
             self._unsub_state()
             self._unsub_state = None
+        if self._unsub_tick is not None:
+            self._unsub_tick()
+            self._unsub_tick = None
         if self.data is not None:
             await self._store.async_save_session(self._config_entry_ref.entry_id, self.data.session)
 
@@ -284,6 +291,121 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
     def _handle_source_change(self, event) -> None:
         self.hass.async_create_task(self._async_process_source_change(event))
 
+    @callback
+    def _handle_time_tick(self, now: datetime) -> None:
+        if self._tick_in_progress:
+            return
+        self._tick_in_progress = True
+        self.hass.async_create_task(self._async_process_time_tick(now))
+
+    def _refresh_periodic_tick(self, session: OccupancySession | None) -> None:
+        """Start or stop the periodic runtime tick based on session state."""
+        needs_tick = bool(session and session.active)
+
+        if needs_tick and self._unsub_tick is None:
+            self._unsub_tick = async_track_time_interval(
+                self.hass,
+                self._handle_time_tick,
+                SESSION_TICK_INTERVAL,
+            )
+        elif not needs_tick and self._unsub_tick is not None:
+            self._unsub_tick()
+            self._unsub_tick = None
+
+    async def _async_process_time_tick(self, now: datetime) -> None:
+        """Advance duration, stages, and decay while a session is open."""
+        try:
+            if self.data is None:
+                return
+
+            session = self.data.session
+            if session is None or not session.active:
+                self._refresh_periodic_tick(session)
+                return
+
+            source_state = self._read_source_state()
+            if self._source_is_unavailable(source_state):
+                if source_state != self.data.source_state:
+                    self.async_set_updated_data(
+                        replace(
+                            self.data,
+                            source_state=source_state,
+                            last_transition_reason="source unavailable; session preserved",
+                        )
+                    )
+                else:
+                    self.async_update_listeners()
+                return
+
+            source_active, authoritative = self._source_is_active(
+                self.data.capability_summary,
+                source_state,
+                strategy=self.data.strategy,
+            )
+
+            if source_active:
+                transition = decay_tick(
+                    session,
+                    SessionEvaluationInput(
+                        now=now,
+                        source_currently_active=True,
+                        authoritative_active=authoritative,
+                        elapsed_since_last_activity=0.0,
+                        default_half_life=self.data.default_half_life,
+                        end_threshold=self.data.end_threshold,
+                        end_grace_seconds=self.data.end_grace,
+                        stages=self.data.stages,
+                    ),
+                )
+            else:
+                inactive_session = (
+                    source_became_inactive(session, now).session
+                    if session.state == SessionState.ACTIVE
+                    else session
+                )
+                transition = decay_tick(
+                    inactive_session,
+                    SessionEvaluationInput(
+                        now=now,
+                        source_currently_active=False,
+                        authoritative_active=False,
+                        elapsed_since_last_activity=max(
+                            0.0,
+                            (now - inactive_session.last_activity_at).total_seconds(),
+                        ),
+                        default_half_life=self.data.default_half_life,
+                        end_threshold=self.data.end_threshold,
+                        end_grace_seconds=self.data.end_grace,
+                        stages=self.data.stages,
+                    ),
+                )
+                if transition.session.state == SessionState.ENDING:
+                    grace_transition = grace_expired(
+                        transition.session,
+                        now,
+                        end_grace_seconds=self.data.end_grace,
+                    )
+                    if grace_transition.changed:
+                        transition = grace_transition
+
+            previous_session = session
+            snapshot = replace(
+                self.data,
+                session=transition.session,
+                source_state=source_state,
+                last_transition_reason=transition.reason,
+            )
+            self._refresh_periodic_tick(transition.session)
+
+            if transition.changed or source_state != self.data.source_state:
+                self.async_set_updated_data(snapshot)
+                await self._store.async_save_session(self._config_entry_ref.entry_id, transition.session)
+                self._emit_events(previous_session, transition)
+            else:
+                self.async_update_listeners()
+        finally:
+            self._tick_in_progress = False
+
     async def _async_process_source_change(self, event: Event) -> None:
         if self.data is None:
             return
@@ -299,6 +421,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         if self._source_is_unavailable(source_state):
             snapshot = replace(self.data, source_state=source_state, last_transition_reason="source unavailable; session preserved")
             self.async_set_updated_data(snapshot)
+            self._refresh_periodic_tick(snapshot.session)
             return
 
         if source_active:
@@ -306,10 +429,11 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
         elif session is None:
             snapshot = replace(self.data, source_state=source_state, last_transition_reason="source inactive with no open session")
             self.async_set_updated_data(snapshot)
+            self._refresh_periodic_tick(snapshot.session)
             return
         else:
             transition = decay_tick(
-                source_became_inactive(session).session if session.state == SessionState.ACTIVE else session,
+                source_became_inactive(session, now).session if session.state == SessionState.ACTIVE else session,
                 SessionEvaluationInput(
                     now=now,
                     source_currently_active=False,
@@ -338,6 +462,7 @@ class OccupancyDurationCoordinator(DataUpdateCoordinator[RuntimeSnapshot]):
             last_transition_reason=transition.reason,
         )
         self.async_set_updated_data(snapshot)
+        self._refresh_periodic_tick(transition.session)
         await self._store.async_save_session(self._config_entry_ref.entry_id, transition.session)
         self._emit_events(previous_session, transition)
 

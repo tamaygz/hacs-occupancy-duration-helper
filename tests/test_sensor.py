@@ -23,6 +23,8 @@ def _coordinator_with_session(stage: str | None = None):
             last_active_signal_at=session.last_active_signal_at,
             ended_at=session.ended_at,
             score=session.score,
+            decay_anchor_at=session.decay_anchor_at,
+            decay_anchor_score=session.decay_anchor_score,
             stage=stage,
             state=session.state,
         )
@@ -78,6 +80,9 @@ def test_entities_expose_shared_device_info() -> None:
 
     duration = OccupancyDurationSensor(coordinator, entry)
     occupancy = OccupancyBinarySensor(coordinator, entry)
+
+    assert duration.device_info is not None
+    assert occupancy.device_info is not None
 
     assert duration.device_info["identifiers"] == {(DOMAIN, "entry-id")}
     assert occupancy.device_info["identifiers"] == {(DOMAIN, "entry-id")}
