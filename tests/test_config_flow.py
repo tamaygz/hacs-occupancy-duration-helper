@@ -70,6 +70,22 @@ def test_validate_stage_payload_accepts_valid_stage() -> None:
     assert stage[CONF_STAGE_MAX_DURATION] == 60
 
 
+def test_validate_stage_payload_accepts_selector_float_values() -> None:
+    stage = validate_stage_payload(
+        {
+            CONF_STAGE_ID: "short",
+            CONF_STAGE_NAME: "Short",
+            CONF_STAGE_MIN_DURATION: 0.0,
+            CONF_STAGE_MAX_DURATION: 60.0,
+            CONF_STAGE_HALF_LIFE: 30.0,
+        },
+        [],
+    )
+    assert stage[CONF_STAGE_MIN_DURATION] == 0
+    assert stage[CONF_STAGE_MAX_DURATION] == 60
+    assert stage[CONF_STAGE_HALF_LIFE] == 30
+
+
 def test_validate_stage_payload_rejects_inverted_range() -> None:
     try:
         validate_stage_payload(

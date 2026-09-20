@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
+import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 
 from .const import DATA_COORDINATOR, DOMAIN, PLATFORMS
 from .coordinator import OccupancyDurationCoordinator
+from .entity import ENTITY_OBJECT_SUFFIXES, build_entity_id, is_legacy_entity_id
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Occupancy Duration Helper from a config entry."""
+    _async_migrate_legacy_entity_ids(hass, entry)
+
     coordinator = OccupancyDurationCoordinator(hass, entry)
     await coordinator.async_initialize()
 
@@ -34,3 +42,38 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload the entry when options change."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+def _async_migrate_legacy_entity_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Rename pre-device-era entity ids to instance-specific ids."""
+    ent_reg = er.async_get(hass)
+
+    for object_suffix, entity_domain in ENTITY_OBJECT_SUFFIXES.items():
+        unique_id = f"{entry.entry_id}_{object_suffix}"
+        current_entity_id = ent_reg.async_get_entity_id(entity_domain, DOMAIN, unique_id)
+        if current_entity_id is None:
+            continue
+
+        if not is_legacy_entity_id(current_entity_id, entity_domain, object_suffix):
+            continue
+
+        preferred_entity_id = build_entity_id(entry, entity_domain, object_suffix)
+        if current_entity_id == preferred_entity_id:
+            continue
+        if ent_reg.async_get(preferred_entity_id) is not None:
+            _LOGGER.warning(
+                "Cannot migrate %s to %s because the target entity_id already exists",
+                current_entity_id,
+                preferred_entity_id,
+            )
+            continue
+
+        try:
+            ent_reg.async_update_entity(current_entity_id, new_entity_id=preferred_entity_id)
+        except ValueError:
+            _LOGGER.warning(
+                "Failed to migrate %s to %s",
+                current_entity_id,
+                preferred_entity_id,
+                exc_info=True,
+            )

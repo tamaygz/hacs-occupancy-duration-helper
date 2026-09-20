@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from numbers import Real
 from typing import Any
 
 import voluptuous as vol
@@ -108,29 +109,17 @@ def validate_stage_payload(
     existing_stages: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Validate one stage against existing stage definitions."""
-    raw_min_duration = stage[CONF_STAGE_MIN_DURATION]
-    if not isinstance(raw_min_duration, (int, str)):
+    min_duration = _coerce_stage_number(stage.get(CONF_STAGE_MIN_DURATION), allow_empty=False)
+    if min_duration is None or min_duration < 0:
         raise ValueError("invalid_stage_range")
-    min_duration = int(raw_min_duration)
 
-    raw_max_duration = stage.get(CONF_STAGE_MAX_DURATION)
-    max_duration: int | None
-    if raw_max_duration in ("", None):
-        max_duration = None
-    elif not isinstance(raw_max_duration, (int, str)):
+    max_duration = _coerce_stage_number(stage.get(CONF_STAGE_MAX_DURATION), allow_empty=True)
+    if max_duration is not None and max_duration <= min_duration:
         raise ValueError("invalid_stage_range")
-    elif int(raw_max_duration) <= min_duration:
-        raise ValueError("invalid_stage_range")
-    else:
-        max_duration = int(raw_max_duration)
 
-    raw_half_life = stage.get(CONF_STAGE_HALF_LIFE)
-    if raw_half_life in ("", None):
-        half_life: int | None = None
-    elif not isinstance(raw_half_life, (int, str)):
+    half_life = _coerce_stage_number(stage.get(CONF_STAGE_HALF_LIFE), allow_empty=True)
+    if half_life is not None and half_life <= 0:
         raise ValueError("invalid_stage_range")
-    else:
-        half_life = int(raw_half_life)
 
     normalised = {
         CONF_STAGE_ID: str(stage[CONF_STAGE_ID]).strip(),
@@ -157,6 +146,27 @@ def validate_stage_payload(
             raise ValueError("stage_overlap")
 
     return normalised
+
+
+def _coerce_stage_number(value: Any, *, allow_empty: bool) -> int | None:
+    """Normalise HA selector values to integer seconds."""
+    if value in ("", None):
+        if allow_empty:
+            return None
+        raise ValueError("invalid_stage_range")
+
+    if isinstance(value, bool) or not isinstance(value, (Real, str)):
+        raise ValueError("invalid_stage_range")
+
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as err:
+        raise ValueError("invalid_stage_range") from err
+
+    if not numeric.is_integer():
+        raise ValueError("invalid_stage_range")
+
+    return int(numeric)
 
 
 def source_change_requires_reset(config_entry: ConfigEntry, new_source_entity: str) -> tuple[bool, int]:

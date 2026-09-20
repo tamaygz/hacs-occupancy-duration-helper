@@ -8,6 +8,7 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, Sen
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTime
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -24,8 +25,16 @@ from .const import (
     DATA_COORDINATOR,
     DOMAIN,
 )
+from .entity import build_device_info, build_suggested_object_id
 
 PARALLEL_UPDATES = 0
+
+
+def _stage_value(session) -> str:
+    """Return a stable public stage value for states and attributes."""
+    if session is None or session.stage is None:
+        return "none"
+    return session.stage
 
 
 async def async_setup_entry(
@@ -52,6 +61,16 @@ class OccupancyBaseEntity(CoordinatorEntity[OccupancyDurationCoordinator]):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
+    def __init__(
+        self,
+        coordinator: OccupancyDurationCoordinator,
+        entry: ConfigEntry,
+        object_suffix: str,
+    ) -> None:
+        super().__init__(coordinator)
+        self._attr_device_info = build_device_info(entry)
+        self._attr_suggested_object_id = build_suggested_object_id(entry, object_suffix)
+
 
 class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):
     """Expose current open-session duration."""
@@ -62,7 +81,7 @@ class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):
     _unrecorded_attributes = frozenset({ATTR_STARTED_AT, ATTR_LAST_ACTIVITY_AT})
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "duration")
         self._attr_unique_id = f"{entry.entry_id}_duration"
 
     @property
@@ -87,7 +106,7 @@ class OccupancyDurationSensor(OccupancyBaseEntity, SensorEntity):
             ATTR_ACTIVE: bool(session and session.active),
             ATTR_STARTED_AT: session.started_at.isoformat() if session else None,
             ATTR_LAST_ACTIVITY_AT: session.last_activity_at.isoformat() if session else None,
-            ATTR_STAGE: session.stage if session else None,
+            ATTR_STAGE: _stage_value(session),
             ATTR_SESSION_STATE: session.state.value if session else "idle",
             ATTR_SCORE: round(session.score, 1) if session else 0,
             ATTR_SOURCE_ENTITY: data.source_entity if data is not None else None,
@@ -101,14 +120,14 @@ class OccupancyDurationStageSensor(OccupancyBaseEntity, SensorEntity):
     _attr_name = "Stage"
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "stage")
         self._attr_unique_id = f"{entry.entry_id}_stage"
 
     @property
     def native_value(self) -> str | None:
         data: RuntimeSnapshot | None = self.coordinator.data
         session = data.session if data is not None else None
-        return session.stage if session else None
+        return _stage_value(session)
 
 
 class OccupancyActivityScoreSensor(OccupancyBaseEntity, SensorEntity):
@@ -117,10 +136,11 @@ class OccupancyActivityScoreSensor(OccupancyBaseEntity, SensorEntity):
     _attr_name = "Activity score"
     _attr_native_unit_of_measurement = "%"
     _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "activity_score")
         self._attr_unique_id = f"{entry.entry_id}_activity_score"
 
     @property
@@ -134,10 +154,11 @@ class OccupancyStrategySensor(OccupancyBaseEntity, SensorEntity):
     """Diagnostic: exposes the active sensor strategy. Disabled by default."""
 
     _attr_name = "Sensor strategy"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "sensor_strategy")
         self._attr_unique_id = f"{entry.entry_id}_sensor_strategy"
 
     @property
@@ -151,10 +172,11 @@ class OccupancyLastActivitySensor(OccupancyBaseEntity, SensorEntity):
 
     _attr_name = "Last activity"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "last_activity")
         self._attr_unique_id = f"{entry.entry_id}_last_activity"
 
     @property
@@ -169,10 +191,11 @@ class OccupancySessionStartedSensor(OccupancyBaseEntity, SensorEntity):
 
     _attr_name = "Session started"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
+        super().__init__(coordinator, entry, "session_started")
         self._attr_unique_id = f"{entry.entry_id}_session_started"
 
     @property

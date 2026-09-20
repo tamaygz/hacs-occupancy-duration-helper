@@ -10,6 +10,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DATA_COORDINATOR, DOMAIN
 from .coordinator import OccupancyDurationCoordinator, RuntimeSnapshot
+from .entity import build_device_info, build_suggested_object_id
 
 PARALLEL_UPDATES = 0
 
@@ -33,6 +34,8 @@ class OccupancyBinarySensor(CoordinatorEntity[OccupancyDurationCoordinator], Bin
 
     def __init__(self, coordinator: OccupancyDurationCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator)
+        self._attr_device_info = build_device_info(entry)
+        self._attr_suggested_object_id = build_suggested_object_id(entry, "occupancy")
         self._attr_unique_id = f"{entry.entry_id}_occupancy"
 
     @property
