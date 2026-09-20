@@ -5,6 +5,15 @@ from __future__ import annotations
 from enum import StrEnum
 
 DOMAIN = "occupancy_duration"
+PLATFORMS: list[str] = ["sensor", "binary_sensor"]
+DATA_COORDINATOR = "coordinator"
+
+EVENT_SESSION_STARTED = "occupancy_duration_started"
+EVENT_SESSION_STAGE_CHANGED = "occupancy_duration_stage_changed"
+EVENT_SESSION_ENDED = "occupancy_duration_ended"
+
+STORAGE_KEY = f"{DOMAIN}_sessions"
+STORAGE_VERSION = 1
 
 # Config/options keys
 CONF_NAME = "name"
@@ -31,6 +40,13 @@ DEFAULT_END_GRACE = 15  # seconds
 DEFAULT_RESTORE_SESSION = True
 DEFAULT_NAME = "Occupancy Duration"
 DEFAULT_SOURCE_REVISION = 1
+
+ATTR_ACTIVE = "active"
+ATTR_STARTED_AT = "started_at"
+ATTR_LAST_ACTIVITY_AT = "last_activity_at"
+ATTR_STAGE = "stage"
+ATTR_SESSION_STATE = "session_state"
+ATTR_SCORE = "score"
 
 # Score bounds
 SCORE_MAX = 100.0

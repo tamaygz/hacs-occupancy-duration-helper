@@ -4,11 +4,11 @@ version: 1.0
 date_created: 2026-09-20
 last_updated: 2026-09-20
 owner: tamaysgz
-status: 'Planned'
+status: 'Completed'
 tags: [feature, entities, persistence, diagnostics, events]
 ---
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: Completed](https://img.shields.io/badge/status-Completed-brightgreen)
 
 # Entities, Persistence, And Observability Plan
 
@@ -34,9 +34,9 @@ tags: [feature, entities, persistence, diagnostics, events]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-001 | Create `custom_components/occupancy_duration/__init__.py` with `async_setup_entry`, `async_unload_entry`, and config-entry listener registration for platforms and runtime services. |  |  |
-| TASK-002 | Create `custom_components/occupancy_duration/coordinator.py` with a coordinator or shared runtime manager that bridges source updates, session evaluation, persistence, and entity refresh signals. |  |  |
-| TASK-003 | Define the in-memory entry state container in `custom_components/occupancy_duration/coordinator.py` so entities, diagnostics, and storage read the same authoritative runtime snapshot. |  |  |
+| TASK-001 | Create `custom_components/occupancy_duration/__init__.py` with `async_setup_entry`, `async_unload_entry`, and config-entry listener registration for platforms and runtime services. | ✅ | 2026-09-20 |
+| TASK-002 | Create `custom_components/occupancy_duration/coordinator.py` with a coordinator or shared runtime manager that bridges source updates, session evaluation, persistence, and entity refresh signals. | ✅ | 2026-09-20 |
+| TASK-003 | Define the in-memory entry state container in `custom_components/occupancy_duration/coordinator.py` so entities, diagnostics, and storage read the same authoritative runtime snapshot. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 2 - Entity Platforms
 
@@ -44,9 +44,9 @@ tags: [feature, entities, persistence, diagnostics, events]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-004 | Create `custom_components/occupancy_duration/sensor.py` with the duration sensor and conditional stage sensor, including unique IDs and attributes aligned with PRD requirements. |  |  |
-| TASK-005 | Create `custom_components/occupancy_duration/binary_sensor.py` with the occupancy binary sensor using `device_class=occupancy` and runtime state derived from the session model. |  |  |
-| TASK-006 | Decide whether optional diagnostic entities belong in `sensor.py` or a later dedicated platform and document that decision in code comments or module structure without exposing them by default. |  |  |
+| TASK-004 | Create `custom_components/occupancy_duration/sensor.py` with the duration sensor and conditional stage sensor, including unique IDs and attributes aligned with PRD requirements. | ✅ | 2026-09-20 |
+| TASK-005 | Create `custom_components/occupancy_duration/binary_sensor.py` with the occupancy binary sensor using `device_class=occupancy` and runtime state derived from the session model. | ✅ | 2026-09-20 |
+| TASK-006 | Decide whether optional diagnostic entities belong in `sensor.py` or a later dedicated platform and document that decision in code comments or module structure without exposing them by default. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 3 - Persistence And Restore
 
@@ -54,9 +54,9 @@ tags: [feature, entities, persistence, diagnostics, events]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-007 | Create `custom_components/occupancy_duration/storage.py` using Home Assistant supported storage mechanisms to serialize `session_id`, timestamps, score, stage, and state per config entry. |  |  |
-| TASK-008 | Implement restore orchestration in `custom_components/occupancy_duration/__init__.py` or `custom_components/occupancy_duration/coordinator.py` that re-detects capabilities and recalculates session state before entities are refreshed. |  |  |
-| TASK-009 | Implement source-unavailable handling in `custom_components/occupancy_duration/storage.py` and `custom_components/occupancy_duration/coordinator.py` so restore does not incorrectly close sessions when state cannot be read. |  |  |
+| TASK-007 | Create `custom_components/occupancy_duration/storage.py` using Home Assistant supported storage mechanisms to serialize `session_id`, timestamps, score, stage, and state per config entry. | ✅ | 2026-09-20 |
+| TASK-008 | Implement restore orchestration in `custom_components/occupancy_duration/__init__.py` or `custom_components/occupancy_duration/coordinator.py` that re-detects capabilities and recalculates session state before entities are refreshed. | ✅ | 2026-09-20 |
+| TASK-009 | Implement source-unavailable handling in `custom_components/occupancy_duration/storage.py` and `custom_components/occupancy_duration/coordinator.py` so restore does not incorrectly close sessions when state cannot be read. | ✅ | 2026-09-20 |
 
 ### Implementation Phase 4 - Diagnostics And Events
 
@@ -64,9 +64,9 @@ tags: [feature, entities, persistence, diagnostics, events]
 
 | Task | Description | Completed | Date |
 |---|---|---|---|
-| TASK-010 | Create `custom_components/occupancy_duration/diagnostics.py` returning a sanitized diagnostics payload with source, capability, strategy, session, and decay information. |  |  |
-| TASK-011 | Emit `occupancy_duration_started`, `occupancy_duration_stage_changed`, and `occupancy_duration_ended` from coordinator or session transition hooks with stable payload fields. |  |  |
-| TASK-012 | Create `tests/test_sensor.py` and `tests/test_restore.py` covering entity creation, attribute correctness, restore behavior, unavailable-source handling, diagnostics shape, and event emission order. |  |  |
+| TASK-010 | Create `custom_components/occupancy_duration/diagnostics.py` returning a sanitized diagnostics payload with source, capability, strategy, session, and decay information. | ✅ | 2026-09-20 |
+| TASK-011 | Emit `occupancy_duration_started`, `occupancy_duration_stage_changed`, and `occupancy_duration_ended` from coordinator or session transition hooks with stable payload fields. | ✅ | 2026-09-20 |
+| TASK-012 | Create `tests/test_sensor.py` and `tests/test_restore.py` covering entity creation, attribute correctness, restore behavior, unavailable-source handling, diagnostics shape, and event emission order. | ✅ | 2026-09-20 |
 
 ## Section 3 - Alternatives
 
