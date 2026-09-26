@@ -4,6 +4,8 @@
 [![hacs][hacs-shield]][hacs]
 [![License][license-shield]](LICENSE)
 
+:pushpin: [HASS Community Thread](https://community.home-assistant.io/t/occupancy-duration-helper-finally-poop-in-peace/1025758)
+
 Occupancy Duration Helper is a Home Assistant custom integration that turns motion and presence signals into persistent occupancy sessions with duration tracking, configurable stages, and adaptive decay.
 
 It grew out of practical bathroom automations in my own home: I wanted to play music on the toilet, but only when actually pooping, so a fade-in starts only when a longer visit reaches the configured long stage. I also wanted music and ventilation while showering, but not when someone only enters briefly to wash their hands. This integration makes those use cases easy by listening to a motion sensor and tracking the session over time according to the configured stage profile.
