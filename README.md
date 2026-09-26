@@ -3,8 +3,7 @@
 [![GitHub Release][releases-shield]][releases]
 [![hacs][hacs-shield]][hacs]
 [![License][license-shield]](LICENSE)
-
-:pushpin: [HASS Community Thread](https://community.home-assistant.io/t/occupancy-duration-helper-finally-poop-in-peace/1025758)
+[![HA Community Forum - Occupancy Duration Helper - Finally poop in peace](https://img.shields.io/badge/HA_Community_Forum-Occupancy_Duration_Helper_--_Finally_poop_in_peace-2ea44f?logo=homeassistant)](https://community.home-assistant.io/t/occupancy-duration-helper-finally-poop-in-peace/1025758)
 
 Occupancy Duration Helper is a Home Assistant custom integration that turns motion and presence signals into persistent occupancy sessions with duration tracking, configurable stages, and adaptive decay.
 
